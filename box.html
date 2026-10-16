@@ -153,6 +153,11 @@
   .ds-footnote{ margin-top:20px; padding-top:14px; border-top:1px dashed var(--divider); }
   .ds-footnote code{ font-family:var(--mono); font-size:11px; background:var(--action-hover); padding:1px 5px; border-radius:4px; }
 
+  .app-footer{ margin-top:28px; padding-top:16px; border-top:1px solid var(--divider); text-align:center; }
+  .app-footer p{ margin:0; font-size:12px; color:var(--text-secondary); }
+  .app-footer a{ color:var(--text-secondary); text-decoration:underline; }
+  .app-footer a:hover{ color:var(--primary-main); }
+
   [hidden]{ display:none !important; }
 </style>
 
@@ -205,6 +210,10 @@
       <span class="t-caption"><strong>Component mapping</strong> — same Signal tokens as the nav+accordion layout (PageHeader, Tabs, Alert, Card <code>variant="outlined"</code>, Chip <code>variant="tonal"</code>) — <code>Accordion</code> dropped here since every row is always expanded. Layout uses CSS multi-column masonry instead of CSS Grid, which is what fixes the uneven-card whitespace from the grid version.</span>
     </div>
   </section>
+
+  <footer class="app-footer">
+    <p>Obelix by Exotel · Built in Bengaluru · Inspired also by OpenVBX · © 2026 - Exotel Techcom Pvt. Ltd. · <a href="https://exotel.com/terms-of-service-exotel/">Terms</a> · <a href="https://exotel.com/privacy-policy/">Privacy</a> · <a href="https://docs.exotel.com/business-phone-system">Support</a></p>
+  </footer>
 </div>
 
 <script>

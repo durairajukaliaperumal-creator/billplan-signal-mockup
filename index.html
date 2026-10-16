@@ -207,6 +207,12 @@
   .ds-footnote .t-caption{ display:block; }
   .ds-footnote code{ font-family:var(--mono); font-size:11px; background:var(--action-hover); padding:1px 5px; border-radius:4px; }
 
+  /* ---------- App footer — matches the real Obelix page chrome ---------- */
+  .app-footer{ margin-top:28px; padding-top:16px; border-top:1px solid var(--divider); text-align:center; }
+  .app-footer p{ margin:0; font-size:12px; color:var(--text-secondary); }
+  .app-footer a{ color:var(--text-secondary); text-decoration:underline; }
+  .app-footer a:hover{ color:var(--primary-main); }
+
   [hidden]{ display:none !important; }
   .view{ animation: fade .18s ease; }
   @media (prefers-reduced-motion: reduce){ .view{ animation:none; } .expand-icon, .signal-tabs-button button{ transition:none; } }
@@ -270,6 +276,10 @@
       <span class="t-caption"><strong>Component mapping</strong> — PageHeader (title/subtitle) · Tabs <code>tabStyle="button"</code> (view switch) · Alert <code>severity="warning"</code> (readiness banner) · Card <code>variant="outlined"</code> (category groups) · Accordion <code>disableGutters</code> (expandable line items) · Chip <code>variant="tonal"</code> (status + plan tags). Typeface: IBM Plex Sans. Spacing unit 8px, <code>shape.borderRadius: 8</code>.</span>
     </div>
   </section>
+
+  <footer class="app-footer">
+    <p>Obelix by Exotel · Built in Bengaluru · Inspired also by OpenVBX · © 2026 - Exotel Techcom Pvt. Ltd. · <a href="https://exotel.com/terms-of-service-exotel/">Terms</a> · <a href="https://exotel.com/privacy-policy/">Privacy</a> · <a href="https://docs.exotel.com/business-phone-system">Support</a></p>
+  </footer>
 
 </div>
 
