@@ -1,0 +1,383 @@
+<title>Bill Plan (Signal) — Box view</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /*
+    Alternate layout to index.html: every category and every SKU visible on the
+    page at once as a masonry grid of boxes, nothing hidden behind a click or a
+    jump-nav. Same Signal design-system token contract as index.html (see that
+    file's header comment for how those tokens were sourced) — only the layout
+    and the Card content differ.
+  */
+  :root{
+    --font: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --primary-main:#2454FF; --primary-light:#6D93FF; --primary-dark:#0E3ACC; --primary-contrastText:#FFFFFF;
+    --success-main:#2E7D32; --warning-main:#ED6C02; --error-main:#D32F2F; --info-main:#0288D1;
+    --secondary-main:#6C4CD6;
+    --text-primary: rgba(16,20,28,0.92);
+    --text-secondary: rgba(16,20,28,0.62);
+    --text-disabled: rgba(16,20,28,0.38);
+    --background-default:#F4F5F8; --background-paper:#FFFFFF;
+    --divider: rgba(16,20,28,0.12);
+    --action-hover: rgba(16,20,28,0.04);
+    --surface-0:#F4F5F8; --surface-1:#FFFFFF; --surface-2:#FFFFFF;
+    --tonal-primary-bg:#E8EDFF; --tonal-primary-text:#1A3FCC;
+    --tonal-success-bg:#E6F4E8; --tonal-success-text:#1E5E24;
+    --tonal-warning-bg:#FFF1E0; --tonal-warning-text:#B4590A;
+    --tonal-error-bg:#FBE9E9;   --tonal-error-text:#A32424;
+    --tonal-info-bg:#E3F2FB;    --tonal-info-text:#0A6FA8;
+    --tonal-secondary-bg:#EEE9FB; --tonal-secondary-text:#4A33A8;
+    --tonal-default-bg:#EEF0F4; --tonal-default-text:#4A5468;
+    --radius: 8px; --sp: 8px;
+    --shadow-1: 0 1px 2px rgba(16,20,28,0.08), 0 1px 1px rgba(16,20,28,0.06);
+    --shadow-2: 0 2px 6px rgba(16,20,28,0.10), 0 1px 2px rgba(16,20,28,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --primary-main:#7C9DFF; --primary-light:#A9C0FF; --primary-dark:#3D5FE0; --primary-contrastText:#0B1220;
+      --success-main:#6FCF7E; --warning-main:#F2A94E; --error-main:#F18686; --info-main:#5FC1F2; --secondary-main:#B6A2F7;
+      --text-primary: rgba(236,239,245,0.94); --text-secondary: rgba(236,239,245,0.66); --text-disabled: rgba(236,239,245,0.38);
+      --background-default:#0B0E14; --background-paper:#121722;
+      --divider: rgba(236,239,245,0.12); --action-hover: rgba(236,239,245,0.06);
+      --surface-0:#0B0E14; --surface-1:#121722; --surface-2:#171D2B;
+      --tonal-primary-bg: rgba(124,157,255,0.16); --tonal-primary-text:#AEC2FF;
+      --tonal-success-bg: rgba(111,207,126,0.16); --tonal-success-text:#9BE0A8;
+      --tonal-warning-bg: rgba(242,169,78,0.18);  --tonal-warning-text:#F6C083;
+      --tonal-error-bg: rgba(241,134,134,0.16);   --tonal-error-text:#F7B0B0;
+      --tonal-info-bg: rgba(95,193,242,0.16);     --tonal-info-text:#A7DEF7;
+      --tonal-secondary-bg: rgba(182,162,247,0.18); --tonal-secondary-text:#D2C4FA;
+      --tonal-default-bg: rgba(236,239,245,0.08); --tonal-default-text:#C7CDD9;
+      --shadow-1: 0 1px 2px rgba(0,0,0,0.5); --shadow-2: 0 2px 6px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"]{
+    --primary-main:#7C9DFF; --primary-light:#A9C0FF; --primary-dark:#3D5FE0; --primary-contrastText:#0B1220;
+    --success-main:#6FCF7E; --warning-main:#F2A94E; --error-main:#F18686; --info-main:#5FC1F2; --secondary-main:#B6A2F7;
+    --text-primary: rgba(236,239,245,0.94); --text-secondary: rgba(236,239,245,0.66); --text-disabled: rgba(236,239,245,0.38);
+    --background-default:#0B0E14; --background-paper:#121722;
+    --divider: rgba(236,239,245,0.12); --action-hover: rgba(236,239,245,0.06);
+    --surface-0:#0B0E14; --surface-1:#121722; --surface-2:#171D2B;
+    --tonal-primary-bg: rgba(124,157,255,0.16); --tonal-primary-text:#AEC2FF;
+    --tonal-success-bg: rgba(111,207,126,0.16); --tonal-success-text:#9BE0A8;
+    --tonal-warning-bg: rgba(242,169,78,0.18);  --tonal-warning-text:#F6C083;
+    --tonal-error-bg: rgba(241,134,134,0.16);   --tonal-error-text:#F7B0B0;
+    --tonal-info-bg: rgba(95,193,242,0.16);     --tonal-info-text:#A7DEF7;
+    --tonal-secondary-bg: rgba(182,162,247,0.18); --tonal-secondary-text:#D2C4FA;
+    --tonal-default-bg: rgba(236,239,245,0.08); --tonal-default-text:#C7CDD9;
+    --shadow-1: 0 1px 2px rgba(0,0,0,0.5); --shadow-2: 0 2px 6px rgba(0,0,0,0.55);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{ background:var(--background-default); color:var(--text-primary); font-family:var(--font);
+    font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+  .page{ max-width:1280px; margin:0 auto; padding:24px 20px 64px; }
+  .mono{ font-family:var(--mono); font-variant-numeric:tabular-nums; }
+
+  .t-title3{ font-size:18px; font-weight:600; line-height:1.3; margin:0; }
+  .t-title2{ font-size:15.5px; font-weight:600; line-height:1.35; margin:0; }
+  .t-body1{ font-size:13.5px; font-weight:400; line-height:1.45; margin:0; }
+  .t-body2{ font-size:13.5px; font-weight:400; line-height:1.5; margin:0; color:var(--text-secondary); }
+  .t-caption{ font-size:11.5px; font-weight:400; line-height:1.4; margin:0; color:var(--text-secondary); }
+
+  .page-header{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
+    margin-bottom:6px; flex-wrap:wrap; }
+  .heading-block{ display:flex; flex-direction:column; gap:2px; }
+  .layout-switch{ font-size:12.5px; }
+  .layout-switch a{ color:var(--primary-main); text-decoration:none; font-weight:600; }
+  .layout-switch a:hover{ text-decoration:underline; }
+
+  .signal-tabs-button{ display:inline-flex; gap:2px; padding:3px; background:var(--surface-1);
+    border:1px solid var(--divider); border-radius:999px; box-shadow:var(--shadow-1); }
+  .signal-tabs-button button{ appearance:none; border:none; background:transparent; cursor:pointer;
+    font-family:var(--font); font-weight:600; font-size:13px; color:var(--text-secondary);
+    padding:7px 16px; border-radius:999px; transition:background .15s ease,color .15s ease; }
+  .signal-tabs-button button[aria-selected="true"]{ background:var(--primary-main); color:var(--primary-contrastText); }
+
+  .signal-alert{ display:flex; gap:10px; align-items:flex-start; padding:10px 14px; border-radius:var(--radius);
+    margin:14px 0 18px; background:var(--tonal-warning-bg); color:var(--tonal-warning-text); }
+  .signal-alert .icon svg{ width:18px; height:18px; display:block; margin-top:1px; }
+  .signal-alert .stats{ display:flex; gap:18px; margin-bottom:4px; flex-wrap:wrap; }
+  .signal-alert .stats b{ font-family:var(--mono); font-size:15px; }
+  .signal-alert .stats span{ font-size:11px; text-transform:uppercase; letter-spacing:.3px; opacity:.85; margin-left:4px; }
+  .signal-alert p{ margin:0; font-size:12.5px; opacity:.92; }
+
+  /* ---- Masonry: CSS columns, not CSS grid. Grid pairs cards by row index, so a
+     tall card next to a short one leaves a dead gap on the short side — that was
+     last design's whitespace bug. Columns flow top-to-bottom per column instead,
+     so every box packs against the one above it regardless of height. ---- */
+  .cat-boxes{ columns: 2 420px; column-gap:14px; }
+  @media (max-width:760px){ .cat-boxes{ columns:1; } }
+  .signal-card-outlined{ display:inline-block; width:100%; break-inside:avoid; -webkit-column-break-inside:avoid;
+    margin:0 0 14px; background:var(--surface-1); border:1px solid var(--divider); border-radius:var(--radius);
+    overflow:hidden; }
+  .cat-card-head{ display:flex; align-items:center; gap:9px; padding:13px 15px 11px; }
+  .cat-icon{ width:28px; height:28px; border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .cat-icon svg{ width:15px; height:15px; }
+  .cat-card-head .meta{ min-width:0; }
+
+  .signal-alert-inline{ margin:0 15px 9px; padding:7px 10px; border-radius:6px; font-size:11px;
+    background:var(--tonal-warning-bg); color:var(--tonal-warning-text); }
+
+  /* ---- Item rows: everything visible, nothing to click open. ---- */
+  .item-row{ border-top:1px solid var(--divider); padding:10px 15px 11px; }
+  .item-row:first-of-type{ border-top:none; }
+  .item-row-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .item-row-top .nm{ font-size:13px; font-weight:600; display:block; }
+  .item-row-top .sub{ font-size:11px; color:var(--text-secondary); display:block; margin-top:1px; }
+  .item-row-price{ text-align:right; white-space:nowrap; flex-shrink:0; }
+  .item-row-price .amt{ font-size:13px; font-weight:600; }
+  .item-row-price .unit{ font-size:10.5px; color:var(--text-secondary); display:block; }
+  .item-row-tiers{ margin-top:6px; font-size:11px; color:var(--text-secondary); }
+  .item-row-tiers .tier-pair{ display:inline; }
+  .item-row-tiers .tier-pair + .tier-pair::before{ content:" · "; }
+  .item-meta{ display:flex; gap:5px; margin-top:7px; flex-wrap:wrap; align-items:center; }
+  .item-note{ margin:6px 0 0; font-size:11px; color:var(--tonal-warning-text); }
+
+  .signal-chip{ display:inline-flex; align-items:center; height:19px; padding:0 8px; border-radius:999px;
+    font-size:10px; font-weight:600; font-family:var(--font); white-space:nowrap; }
+  .signal-chip.c-default{ background:var(--tonal-default-bg); color:var(--tonal-default-text); }
+  .signal-chip.c-primary{ background:var(--tonal-primary-bg); color:var(--tonal-primary-text); }
+  .signal-chip.c-secondary{ background:var(--tonal-secondary-bg); color:var(--tonal-secondary-text); }
+  .signal-chip.c-success{ background:var(--tonal-success-bg); color:var(--tonal-success-text); }
+  .signal-chip.c-warning{ background:var(--tonal-warning-bg); color:var(--tonal-warning-text); }
+  .signal-chip.c-info{ background:var(--tonal-info-bg); color:var(--tonal-info-text); }
+  .signal-chip.mono{ font-family:var(--mono); font-weight:500; }
+
+  .foot-block{ margin-top:4px; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:760px){ .foot-block{ grid-template-columns:1fr; } }
+  .mini-card{ padding:14px 16px; background:var(--surface-1); border:1px solid var(--divider); border-radius:var(--radius); }
+  .mini-card .t-title2{ margin-bottom:6px; }
+  .credit-amt{ font-family:var(--mono); font-size:20px; font-weight:600; }
+
+  .ds-footnote{ margin-top:20px; padding-top:14px; border-top:1px dashed var(--divider); }
+  .ds-footnote code{ font-family:var(--mono); font-size:11px; background:var(--action-hover); padding:1px 5px; border-radius:4px; }
+
+  [hidden]{ display:none !important; }
+</style>
+
+<div class="page">
+  <div class="page-header">
+    <div class="heading-block">
+      <h1 class="t-title3">Bill Plan — box view</h1>
+      <p class="t-body2">Every product and SKU visible on the page at once — no click-to-expand, no jump-nav. <span class="layout-switch">· <a href="index.html">Switch to nav + accordion layout</a></span></p>
+    </div>
+    <div class="signal-tabs-button" role="tablist" aria-label="Data source view">
+      <button role="tab" id="tab-legacy" aria-selected="false">Today's live page</button>
+      <button role="tab" id="tab-new" aria-selected="true">Zuora UAT</button>
+    </div>
+  </div>
+
+  <section id="view-legacy" hidden>
+    <div class="signal-alert">
+      <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></span>
+      <div><p>Screenshot of my.exotel.com/exotel2201/billing, for reference only — unchanged by this work.</p></div>
+    </div>
+    <div class="signal-card-outlined" style="display:block;">
+      <table style="width:100%; border-collapse:collapse;">
+        <thead><tr style="border-bottom:1px solid var(--divider); text-align:left;">
+          <th class="t-caption" style="padding:10px 16px; text-transform:uppercase;">Item</th>
+          <th class="t-caption" style="padding:10px 16px; text-transform:uppercase;">Name</th>
+          <th class="t-caption" style="padding:10px 16px; text-transform:uppercase;">Description</th>
+        </tr></thead>
+        <tbody id="legacy-body" class="t-body2" style="color:var(--text-primary);"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="view-new">
+    <div class="signal-alert" id="readiness"></div>
+    <div class="cat-boxes" id="cat-grid"></div>
+
+    <div class="foot-block">
+      <div class="mini-card">
+        <p class="t-title2">Credit Limit</p>
+        <p class="credit-amt">&#8377;0</p>
+        <p class="t-caption" style="margin-top:4px;">Unchanged — served from the account balance API, not part of this migration.</p>
+      </div>
+      <div class="mini-card">
+        <p class="t-title2">Recording storage policy</p>
+        <p class="t-body2">Default · 9 months. Reach your account manager or <span class="mono">hello@exotel.com</span> to extend it.</p>
+      </div>
+    </div>
+
+    <div class="ds-footnote">
+      <span class="t-caption"><strong>Component mapping</strong> — same Signal tokens as the nav+accordion layout (PageHeader, Tabs, Alert, Card <code>variant="outlined"</code>, Chip <code>variant="tonal"</code>) — <code>Accordion</code> dropped here since every row is always expanded. Layout uses CSS multi-column masonry instead of CSS Grid, which is what fixes the uneven-card whitespace from the grid version.</span>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const ICONS = {
+    platform: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/><path d="M7 14h4"/></svg>',
+    voice:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5c0 8 7 15 15 15l1-4-5-2-1.5 1.5A12 12 0 0 1 8 10.5L9.5 9 7.5 4z"/></svg>',
+    sms:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+    wa:       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17l-3 3 .8-3.6A8 8 0 1 1 7 17z"/><path d="M9 10c0 3 2 5 5 5"/></svg>',
+    rcs:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="12" rx="2"/><path d="M8 20h8M9 12h6M9 9h3"/></svg>',
+    users:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 8a3 3 0 1 1 3 3"/><path d="M21 20c0-2.6-1.7-4.8-4-5.6"/></svg>',
+    num:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg>'
+  };
+  const CAT_COLOR = { platform:'primary', voice:'info', sms:'secondary', wa:'success', rcs:'default', users:'primary', num:'default' };
+
+  const CATS = [
+    { key:'platform', title:'Account & Platform', sub:'Product PF-accountrental · 3 variants', icon:'platform', rows:[
+      { nm:'Account Rental', sub:'Recurring · Monthly', price:'₹1,800', unit:'/month', zero:false,
+        plan:'Account Rental – Monthly', charge:'Platform::Recurring::Account Rental Monthly Charge',
+        tiers:[['Flat','₹1,800.00 / month']],
+        note:'"Monthly Prorated" and "Daily" variants of this product are both ₹0 in UAT.' }
+    ]},
+    { key:'voice', title:'Calling', sub:'Product PF-call · 9 variants, all ₹0', icon:'voice',
+      flag:'No pulse/tier variant of Call Charges has a non-zero price loaded in this UAT tenant.', rows:[
+      { nm:'Call Charges', sub:'Usage · 60s pulse, tiered', price:'₹0.00', unit:'/min', zero:true,
+        plan:'Call Charges (60s Pulse) – Tiered', charge:'Voice::Usage::Call Charges',
+        tiers:[['0–999,999 min','₹0.00'],['1,000,000+ min','₹0.00']],
+        note:'Same ₹0 on the 30s/15s pulse variants and the non-tiered plan.' }
+    ]},
+    { key:'sms', title:'Messaging (SMS)', sub:'Product PF-sms · 2 variants', icon:'sms',
+      flag:'Zuora models 2 charges here — the old page\'s Incoming / Transactional / Promotional split doesn\'t exist in this catalog.', rows:[
+      { nm:'SMS', sub:'Usage · flat, not tiered', price:'₹0.131', unit:'/sms', zero:false,
+        plan:'SMS – Usage', charge:'SMS::Usage::SMS', tiers:[['Flat','₹0.131 / sms']] },
+      { nm:'SMS DLT', sub:'Usage · flat, not tiered', price:'₹0.025', unit:'/sms', zero:false,
+        plan:'SMS – Usage', charge:'SMS::Usage::SMS DLT', tiers:[['Flat','₹0.025 / sms']],
+        note:'"Tiered" variant carries identical values on both tiers — not differentiating price yet.' }
+    ]},
+    { key:'wa', title:'WhatsApp', sub:'Products: converse · rental · host', icon:'wa', rows:[
+      { nm:'Conversation — Marketing', sub:'Usage · Meta category', price:'₹0.19', unit:'/conv.', zero:false,
+        plan:'WhatsApp Conversation – Usage', charge:'WhatsApp::Usage::WhatsApp Marketing', tiers:[['Flat','₹0.19 / conversation']] },
+      { nm:'Conversation — Utility', sub:'Usage · Meta category', price:'₹0.131', unit:'/conv.', zero:false,
+        plan:'WhatsApp Conversation – Usage', charge:'WhatsApp::Usage::WhatsApp Utility', tiers:[['Flat','₹0.131 / conversation']] },
+      { nm:'Conversation — Service', sub:'Usage · Meta category', price:'₹0.131', unit:'/conv.', zero:false,
+        plan:'WhatsApp Conversation – Usage', charge:'WhatsApp::Usage::WhatsApp Service', tiers:[['Flat','₹0.131 / conversation']] },
+      { nm:'Conversation — Authentication', sub:'Usage · Meta category', price:'₹0.12', unit:'/conv.', zero:false,
+        plan:'WhatsApp Conversation – Usage', charge:'WhatsApp::Usage::WhatsApp Authentication', tiers:[['Flat','₹0.12 / conversation']],
+        note:'"Extended Usage" variant (Auth-Intl, API) is ₹0 — not priced yet.' },
+      { nm:'Monthly rental', sub:'Recurring', price:'₹0.00', unit:'/month', zero:true,
+        plan:'WhatsApp Rental – Monthly', charge:'WhatsApp::Recurring::WhatsApp Rental Monthly Charge', tiers:[['Flat','₹0.00']] },
+      { nm:'Hosting setup', sub:'Recurring', price:'₹0.00', unit:'/month', zero:true,
+        plan:'WhatsApp Host – Monthly', charge:'WhatsApp::Recurring::WhatsApp Host Daily Charge', tiers:[['Flat','₹0.00']] }
+    ]},
+    { key:'rcs', title:'RCS', sub:'Products: host · message · rental', icon:'rcs', rows:[
+      { nm:'RCS Message — Text w/ brand', sub:'Usage', price:'₹1.00', unit:'/msg', zero:false,
+        plan:'RCS Message – Usage', charge:'Platform::Usage::RCS Message Text With Brand', tiers:[['Flat','₹1.00 / message']],
+        note:'All 4 RCS Message charges price an identical flat ₹1.00 — reads like a placeholder.' },
+      { nm:'RCS Message — Rich content', sub:'Usage', price:'₹1.00', unit:'/msg', zero:false,
+        plan:'RCS Message – Usage', charge:'Platform::Usage::RCS Message Rich Content', tiers:[['Flat','₹1.00 / message']] },
+      { nm:'RCS Message — P2A conversation', sub:'Usage', price:'₹1.00', unit:'/conv.', zero:false,
+        plan:'RCS Message – Usage', charge:'Platform::Usage::RCS Message P2A', tiers:[['Flat','₹1.00 / conversation']] },
+      { nm:'RCS Message — A2P conversation', sub:'Usage', price:'₹1.00', unit:'/conv.', zero:false,
+        plan:'RCS Message – Usage', charge:'Platform::Usage::RCS Message A2P', tiers:[['Flat','₹1.00 / conversation']] },
+      { nm:'Brand registration (Host)', sub:'Recurring — billing period is "Month" in Zuora', price:'₹0.00', unit:'/mo', zero:true,
+        plan:'RCS Host – Monthly', charge:'RCS::Recurring::RCS Host Monthly Charge', tiers:[['Flat','₹0.00']],
+        note:'Old page calls this "Annual" — Zuora\'s RCS Host has Month-cadence plans only.' },
+      { nm:'Platform rental', sub:'Recurring · Monthly', price:'₹0.00', unit:'/month', zero:true,
+        plan:'RCS Rental – Monthly', charge:'RCS::Recurring::RCS Rental', tiers:[['Flat','₹0.00']] }
+    ]},
+    { key:'users', title:'Users & Seats', sub:'Product PF-user · 6 variants', icon:'users', rows:[
+      { nm:'User seats', sub:'Recurring · Monthly, flat (not tiered)', price:'₹2,200', unit:'/user/mo', zero:false,
+        plan:'User Rental – Monthly', charge:'Platform::Recurring::User Rental Monthly Charge',
+        tiers:[['Flat','₹2,200.00 / user / month']],
+        note:'Tiered variant structurally matches old "3 free, ₹199 after" plan, but both tiers price ₹0 in UAT.' }
+    ]},
+    { key:'num', title:'Numbers', sub:'Product PF-number · 11 variants, all ₹0', icon:'num',
+      flag:'None of Number Rental\'s 11 rate-plan variants carry a non-zero price in this UAT tenant.', rows:[
+      { nm:'ExoPhone — Landline', sub:'Recurring · Monthly', price:'₹0.00', unit:'/number/mo', zero:true,
+        plan:'Number Rental – Monthly', charge:'Platform::Recurring::Number Rental - Landline', tiers:[['Flat','₹0.00']] },
+      { nm:'ExoPhone — Mobile', sub:'Recurring · Monthly', price:'₹0.00', unit:'/number/mo', zero:true,
+        plan:'Number Rental – Monthly', charge:'Platform::Recurring::Number Rental - Mobile', tiers:[['Flat','₹0.00']] },
+      { nm:'ExoPhone — Toll-free', sub:'Recurring · Monthly', price:'₹0.00', unit:'/number/mo', zero:true,
+        plan:'Number Rental – Monthly', charge:'Platform::Recurring::Number Rental - Tollfree', tiers:[['Flat','₹0.00']] }
+    ]}
+  ];
+
+  const LEGACY_ROWS = [
+    ['Account Rental','[Monthly] 4999 rental for 5 months','4999 rental for 5 months (New)'],
+    ['Call Charges','Standard Call Plan','40p/min for local calls\n75p/min for STD calls'],
+    ['SMS Charges','Standard SMS Plan','Incoming SMS - 5 paise  Transactional SMS - 26 paise\nPromotional SMS - 26 paise\nDLT Charges - 2.5 paise'],
+    ['User Charges','[Monthly] 3 users free, rest 199 per user per month','3 users free, rest @ 199.0 credits per user per month'],
+    ['Exophone Software Rental','[Monthly] 1 ExoPhone free, rest 499 per ExoPhone per month','1 ExoPhone free, rest 499 per ExoPhone per month (NEW)'],
+    ['Whatsapp conversation charges','default Whatsapp converse Bill Plan v2','default Whatsapp converse Bill Plan v2'],
+    ['Whatsapp monthly rental','Rental: 4000 Per Month','Rental: 4000 credits Per Month'],
+    ['Whatsapp hosting charges','Standard Whatsapp hosting plan','Standard Setup - 1000 INR per setup/ month\nHigh throughput Setup - 80000 INR per setup/ month'],
+    ['URL shortening charges in SMS','Domestic customers default url_shorten plan','charges 0.02 INR /url_shorten'],
+    ['RCS Brand Registration charges (Annual)','Standard RCS Registration Plan','Rs 10000 per brand registered with Exotel. Charged Annually.'],
+    ['RCS messaging charges','Standard RCS Messaging Plan','Text w/ brand logo & verification: 0.18p\nRich media message: 0.23p \nP2A Conversation: 15p · A2P: 38p'],
+    ['RCS platform rental','Standard RCS Monthly Rental','Rs 3000 INR charged monthly']
+  ];
+  document.getElementById('legacy-body').innerHTML = LEGACY_ROWS.map(([item,name,desc]) => `
+    <tr style="border-bottom:1px solid var(--divider);">
+      <td style="padding:11px 16px; font-weight:600;">${item}</td>
+      <td style="padding:11px 16px; color:var(--text-secondary);">${name}</td>
+      <td style="padding:11px 16px; color:var(--text-secondary); white-space:pre-line;">${desc}</td>
+    </tr>`).join('');
+
+  const ALL_ROWS = CATS.flatMap(c => c.rows);
+  const realCount = ALL_ROWS.filter(r => !r.zero).length;
+  const zeroCount = ALL_ROWS.filter(r => r.zero).length;
+  document.getElementById('readiness').innerHTML = `
+    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></span>
+    <div>
+      <div class="stats">
+        <span><b>${realCount}</b><span>priced in UAT</span></span>
+        <span><b>${zeroCount}</b><span>still ₹0</span></span>
+        <span><b>INR only</b><span>currencies live</span></span>
+      </div>
+      <p>Across the 12 line items on today's page: ${realCount} of ${ALL_ROWS.length} resolved charges have a non-zero list price in tenant 10004316 right now. No USD/AED pricing is configured anywhere in this catalog.</p>
+    </div>`;
+
+  const grid = document.getElementById('cat-grid');
+  CATS.forEach((cat) => {
+    const chipColor = CAT_COLOR[cat.key];
+    const rowsHtml = cat.rows.map((r) => {
+      const tierText = r.tiers.map(t => `<span class="tier-pair">${t[0]}: <span class="mono">${t[1]}</span></span>`).join('');
+      return `
+        <div class="item-row">
+          <div class="item-row-top">
+            <span>
+              <span class="nm">${r.nm}</span>
+              <span class="sub">${r.sub}</span>
+            </span>
+            <span class="item-row-price">
+              <span class="amt mono">${r.price}</span>
+              <span class="unit">${r.unit}</span>
+            </span>
+          </div>
+          <div class="item-row-tiers">${tierText}</div>
+          <div class="item-meta">
+            ${r.zero ? '<span class="signal-chip c-warning">Not priced</span>' : ''}
+            <span class="signal-chip c-${chipColor} mono">${r.plan}</span>
+          </div>
+          ${r.note ? `<p class="item-note">${r.note}</p>` : ''}
+        </div>`;
+    }).join('');
+
+    const card = document.createElement('div');
+    card.className = 'signal-card-outlined';
+    card.innerHTML = `
+      <div class="cat-card-head">
+        <span class="cat-icon" style="color:var(--tonal-${chipColor}-text); background:var(--tonal-${chipColor}-bg);">${ICONS[cat.icon]}</span>
+        <div class="meta">
+          <p class="t-title2">${cat.title}</p>
+          <p class="t-caption">${cat.sub}</p>
+        </div>
+      </div>
+      ${cat.flag ? `<p class="signal-alert-inline">${cat.flag}</p>` : ''}
+      ${rowsHtml}
+    `;
+    grid.appendChild(card);
+  });
+
+  const tabLegacy = document.getElementById('tab-legacy');
+  const tabNew = document.getElementById('tab-new');
+  const viewLegacy = document.getElementById('view-legacy');
+  const viewNew = document.getElementById('view-new');
+  function show(which){
+    const isNew = which === 'new';
+    viewNew.hidden = !isNew; viewLegacy.hidden = isNew;
+    tabNew.setAttribute('aria-selected', String(isNew));
+    tabLegacy.setAttribute('aria-selected', String(!isNew));
+  }
+  tabLegacy.addEventListener('click', () => show('legacy'));
+  tabNew.addEventListener('click', () => show('new'));
+})();
+</script>
