@@ -1,0 +1,323 @@
+<title>Bill Plan — at real scale</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /*
+    Illustrative dataset: product/SKU names and category breakdown reflect
+    Exotel's real product catalog taxonomy (not customer-specific), but every
+    price below is a hand-picked example value, not any real account's actual
+    billing. This exists to make one point: the legacy Bill Plan page hard-codes
+    12 SKUs; a real enterprise account can easily have 100+ active rate plans
+    across a dozen product families. At that scale, fixed category cards don't
+    hold up — this uses a searchable, filterable list instead, per Signal's own
+    guidance (Table is deprecated in favor of DataGrid for exactly this case).
+  */
+  :root{
+    --font: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --primary-main:#0074E8; --primary-light:#3D9BF0; --primary-dark:#00539E; --primary-contrastText:#FFFFFF;
+    --success-main:#2E7D32; --warning-main:#0074E8; --error-main:#D32F2F; --info-main:#0288D1;
+    --secondary-main:#6C4CD6;
+    --text-primary: rgba(16,20,28,0.92);
+    --text-secondary: rgba(16,20,28,0.62);
+    --text-disabled: rgba(16,20,28,0.38);
+    --background-default:#F4F5F8; --background-paper:#FFFFFF;
+    --divider: rgba(16,20,28,0.12);
+    --action-hover: rgba(16,20,28,0.04);
+    --surface-1:#FFFFFF;
+    --tonal-primary-bg:#E8EDFF; --tonal-primary-text:#1A3FCC;
+    --tonal-success-bg:#E6F4E8; --tonal-success-text:#1E5E24;
+    --tonal-warning-bg:#E3F2FD; --tonal-warning-text:#00539E;
+    --tonal-error-bg:#FBE9E9;   --tonal-error-text:#A32424;
+    --tonal-info-bg:#E3F2FB;    --tonal-info-text:#0A6FA8;
+    --tonal-secondary-bg:#EEE9FB; --tonal-secondary-text:#4A33A8;
+    --tonal-default-bg:#EEF0F4; --tonal-default-text:#4A5468;
+    --radius: 8px;
+    --shadow-1: 0 1px 2px rgba(16,20,28,0.08), 0 1px 1px rgba(16,20,28,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --primary-main:#5CA8F2; --primary-contrastText:#0B1220;
+      --success-main:#6FCF7E; --warning-main:#5CA8F2; --error-main:#F18686; --info-main:#5FC1F2; --secondary-main:#B6A2F7;
+      --text-primary: rgba(236,239,245,0.94); --text-secondary: rgba(236,239,245,0.66); --text-disabled: rgba(236,239,245,0.38);
+      --background-default:#0B0E14; --background-paper:#121722;
+      --divider: rgba(236,239,245,0.12); --action-hover: rgba(236,239,245,0.06);
+      --surface-1:#121722;
+      --tonal-primary-bg: rgba(124,157,255,0.16); --tonal-primary-text:#AEC2FF;
+      --tonal-success-bg: rgba(111,207,126,0.16); --tonal-success-text:#9BE0A8;
+      --tonal-warning-bg: rgba(92,168,242,0.18);  --tonal-warning-text:#BBDCFA;
+      --tonal-error-bg: rgba(241,134,134,0.16);   --tonal-error-text:#F7B0B0;
+      --tonal-info-bg: rgba(95,193,242,0.16);     --tonal-info-text:#A7DEF7;
+      --tonal-secondary-bg: rgba(182,162,247,0.18); --tonal-secondary-text:#D2C4FA;
+      --tonal-default-bg: rgba(236,239,245,0.08); --tonal-default-text:#C7CDD9;
+    }
+  }
+  :root[data-theme="dark"]{
+    --primary-main:#5CA8F2; --primary-contrastText:#0B1220;
+    --success-main:#6FCF7E; --warning-main:#5CA8F2; --error-main:#F18686; --info-main:#5FC1F2; --secondary-main:#B6A2F7;
+    --text-primary: rgba(236,239,245,0.94); --text-secondary: rgba(236,239,245,0.66); --text-disabled: rgba(236,239,245,0.38);
+    --background-default:#0B0E14; --background-paper:#121722;
+    --divider: rgba(236,239,245,0.12); --action-hover: rgba(236,239,245,0.06);
+    --surface-1:#121722;
+    --tonal-primary-bg: rgba(124,157,255,0.16); --tonal-primary-text:#AEC2FF;
+    --tonal-success-bg: rgba(111,207,126,0.16); --tonal-success-text:#9BE0A8;
+    --tonal-warning-bg: rgba(92,168,242,0.18);  --tonal-warning-text:#BBDCFA;
+    --tonal-error-bg: rgba(241,134,134,0.16);   --tonal-error-text:#F7B0B0;
+    --tonal-info-bg: rgba(95,193,242,0.16);     --tonal-info-text:#A7DEF7;
+    --tonal-secondary-bg: rgba(182,162,247,0.18); --tonal-secondary-text:#D2C4FA;
+    --tonal-default-bg: rgba(236,239,245,0.08); --tonal-default-text:#C7CDD9;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{ background:var(--background-default); color:var(--text-primary); font-family:var(--font);
+    font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+  .page{ max-width:1280px; margin:0 auto; padding:20px 20px 56px; }
+  .mono{ font-family:var(--mono); font-variant-numeric:tabular-nums; }
+
+  .info-banner{ background:var(--tonal-info-bg); color:var(--tonal-info-text); border-radius:var(--radius);
+    padding:10px 14px; font-size:12.5px; margin-bottom:16px; display:flex; gap:8px; align-items:flex-start; }
+  .info-banner svg{ width:17px; height:17px; flex-shrink:0; margin-top:1px; }
+  .info-banner strong{ display:block; margin-bottom:2px; }
+
+  .t-title3{ font-size:18px; font-weight:600; line-height:1.3; margin:0; }
+  .t-body2{ font-size:13.5px; font-weight:400; line-height:1.5; margin:0; color:var(--text-secondary); }
+  .t-caption{ font-size:11.5px; font-weight:400; line-height:1.4; margin:0; color:var(--text-secondary); }
+
+  .page-header{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:14px; flex-wrap:wrap; }
+  .heading-block{ display:flex; flex-direction:column; gap:2px; }
+
+  .toolbar{ position:sticky; top:0; z-index:5; background:var(--background-default); padding-bottom:10px; }
+  .search-row{ display:flex; gap:10px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+  .search-box{ flex:1; min-width:240px; position:relative; }
+  .search-box input{ width:100%; font-family:var(--font); font-size:13.5px; padding:9px 12px 9px 34px;
+    border:1px solid var(--divider); border-radius:999px; background:var(--surface-1); color:var(--text-primary); }
+  .search-box input:focus{ outline:2px solid var(--primary-main); outline-offset:1px; }
+  .search-box svg{ position:absolute; left:11px; top:50%; transform:translateY(-50%); width:15px; height:15px; color:var(--text-secondary); }
+  .result-count{ font-size:12.5px; color:var(--text-secondary); white-space:nowrap; }
+  .result-count b{ color:var(--text-primary); font-family:var(--mono); }
+
+  .filter-row{ display:flex; gap:6px; overflow-x:auto; padding:2px 2px 4px; }
+  .filter-row::-webkit-scrollbar{ height:5px; }
+  .filter-row::-webkit-scrollbar-thumb{ background:var(--divider); border-radius:99px; }
+  .filter-chip{ appearance:none; cursor:pointer; flex-shrink:0; font-family:var(--font); font-weight:600; font-size:11.5px;
+    color:var(--text-secondary); background:var(--surface-1); border:1px solid var(--divider); border-radius:999px;
+    padding:6px 11px; white-space:nowrap; transition:background .15s ease, color .15s ease, border-color .15s ease; }
+  .filter-chip .n{ opacity:.7; margin-left:4px; }
+  .filter-chip:hover{ border-color:var(--primary-main); }
+  .filter-chip[aria-pressed="true"]{ background:var(--primary-main); color:var(--primary-contrastText); border-color:var(--primary-main); }
+  .filter-chip[data-flag="true"]{ background:var(--tonal-warning-bg); color:var(--tonal-warning-text); border-color:transparent; }
+  .filter-chip[data-flag="true"][aria-pressed="true"]{ background:var(--warning-main); color:#fff; }
+
+  .grid-wrap{ background:var(--surface-1); border:1px solid var(--divider); border-radius:var(--radius); overflow:hidden; }
+  .grid-head{ display:grid; grid-template-columns: 26px 1.6fr 1.4fr 1fr; gap:10px; padding:9px 14px;
+    background:var(--action-hover); border-bottom:1px solid var(--divider); position:sticky; top:96px; z-index:4; }
+  .grid-head span{ font-size:10.5px; font-weight:600; letter-spacing:.4px; text-transform:uppercase; color:var(--text-secondary); }
+  .grid-head .sortable{ cursor:pointer; user-select:none; display:inline-flex; align-items:center; gap:3px; }
+  .grid-head .sortable svg{ width:11px; height:11px; opacity:.5; }
+  .grid-head .sortable.active svg{ opacity:1; color:var(--primary-main); }
+  .grid-head .sortable.active.desc svg{ transform:rotate(180deg); }
+
+  .row{ border-bottom:1px solid var(--divider); }
+  .row:last-child{ border-bottom:none; }
+  .row-main{ width:100%; display:grid; grid-template-columns: 26px 1.6fr 1.4fr 1fr; gap:10px; align-items:center;
+    padding:9px 14px; background:none; border:none; cursor:pointer; text-align:left; font-family:inherit; color:inherit; }
+  .row-main:hover{ background:var(--action-hover); }
+  .row-main:focus-visible{ outline:2px solid var(--primary-main); outline-offset:-2px; }
+  .chev{ width:13px; height:13px; color:var(--text-secondary); transition:transform .15s ease; flex-shrink:0; }
+  .row.expanded .chev{ transform:rotate(90deg); color:var(--primary-main); }
+  .cell-product{ min-width:0; }
+  .cell-product .nm{ font-size:13px; font-weight:600; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cell-product .sku{ font-size:10.5px; color:var(--text-secondary); font-family:var(--mono); display:block; }
+  .cell-plan{ font-size:12px; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cell-price{ text-align:right; font-size:13px; font-weight:600; white-space:nowrap; }
+  .cell-price .multi{ font-size:10px; font-weight:500; color:var(--text-secondary); margin-left:4px; }
+
+  .row-detail{ display:none; padding:2px 14px 12px 50px; }
+  .row.expanded .row-detail{ display:block; }
+  .charge-line{ display:flex; justify-content:space-between; gap:12px; padding:3px 0; font-size:12px;
+    border-bottom:1px dashed var(--divider); }
+  .charge-line:last-of-type{ border-bottom:none; }
+  .charge-line .k{ color:var(--text-secondary); }
+
+  .signal-chip{ display:inline-flex; align-items:center; height:19px; padding:0 8px; border-radius:999px;
+    font-size:10px; font-weight:600; font-family:var(--font); white-space:nowrap; }
+  .signal-chip.c-default{ background:var(--tonal-default-bg); color:var(--tonal-default-text); }
+  .signal-chip.c-primary{ background:var(--tonal-primary-bg); color:var(--tonal-primary-text); }
+  .signal-chip.c-secondary{ background:var(--tonal-secondary-bg); color:var(--tonal-secondary-text); }
+  .signal-chip.c-success{ background:var(--tonal-success-bg); color:var(--tonal-success-text); }
+  .signal-chip.c-warning{ background:var(--tonal-warning-bg); color:var(--tonal-warning-text); }
+  .signal-chip.c-info{ background:var(--tonal-info-bg); color:var(--tonal-info-text); }
+
+  .empty-state{ padding:40px 20px; text-align:center; color:var(--text-secondary); font-size:13px; }
+
+  .app-footer{ margin-top:28px; padding-top:16px; border-top:1px solid var(--divider); text-align:center; }
+  .app-footer p{ margin:0; font-size:12px; color:var(--text-secondary); }
+  .app-footer a{ color:var(--text-secondary); text-decoration:underline; }
+  .app-footer a:hover{ color:var(--primary-main); }
+
+  .ds-footnote{ margin-top:18px; padding-top:14px; border-top:1px dashed var(--divider); }
+  .ds-footnote code{ font-family:var(--mono); font-size:11px; background:var(--action-hover); padding:1px 5px; border-radius:4px; }
+  [hidden]{ display:none !important; }
+</style>
+
+<div class="page">
+  <div class="info-banner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+    <div>
+      <strong>Illustrative data</strong>
+      Product/SKU names and category breakdown reflect a real enterprise Exotel account's actual scale (134 active rate plans across 12 product families) — but every price shown here is a hand-picked example, not any real customer's billing. Built to make one point: the legacy page's 12 hard-coded SKUs don't hold up at real-world scale.
+    </div>
+  </div>
+
+  <div class="page-header">
+    <div class="heading-block">
+      <h1 class="t-title3">Bill Plan — at real scale</h1>
+      <p class="t-body2">130 SKUs across 12 product families — not the legacy page's fixed 12. Search and filter below; nothing is hidden by a default category limit. · <a href="index.html" style="color:var(--primary-main); font-weight:600; text-decoration:none;">Nav + accordion layout</a> · <a href="box.html" style="color:var(--primary-main); font-weight:600; text-decoration:none;">Box layout</a></p>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-row">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="search" placeholder="Search by product, plan, or charge name…" autocomplete="off">
+      </div>
+      <span class="result-count" id="result-count"></span>
+    </div>
+    <div class="filter-row" id="filter-row"></div>
+    <div class="grid-head">
+      <span></span>
+      <span>Product / SKU</span>
+      <span>Rate plan</span>
+      <span class="sortable" id="sort-price">Price <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></span>
+    </div>
+  </div>
+
+  <div class="grid-wrap">
+    <div id="rows"></div>
+    <div class="empty-state" id="empty" hidden>No SKUs match that search/filter combination.</div>
+  </div>
+
+  <footer class="app-footer">
+    <p>Obelix by Exotel · Built in Bengaluru · Inspired also by OpenVBX · © 2026 - Exotel Techcom Pvt. Ltd. · <a href="https://exotel.com/terms-of-service-exotel/">Terms</a> · <a href="https://exotel.com/privacy-policy/">Privacy</a> · <a href="https://docs.exotel.com/business-phone-system">Support</a></p>
+  </footer>
+
+  <div class="ds-footnote">
+    <span class="t-caption"><strong>Component mapping</strong> — PageHeader <code>showSearch</code> (search box) · Chip <code>variant="tonal"</code> (category filters + status/plan tags) · <code>DataGrid</code> pattern in place of deprecated <code>Table</code> (sortable, filterable, row-expand) — Signal's own guidance: never use <code>Table</code> for new tabular UI, and this is exactly the scale/filtering case <code>DataGrid</code> is for.</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const DATA = [{"cat":"Account & Platform","product":"Account Rental","sku":"PF-accountrental","plan":"Account Rental - Monthly","charges":[{"label":"Account Rental Charge","text":"INR 1,800 / Per unit recurrence"}],"zero":false,"primaryPrice":1800},{"cat":"Account & Platform","product":"API Charges","sku":"PF-api","plan":"API Charges - Monthly","charges":[{"label":"API Charges Charge","text":"INR 0.06 / Per unit recurrence"}],"zero":false,"primaryPrice":0.06},{"cat":"Account & Platform","product":"CPM Block","sku":"PF-cpm_block","plan":"CPM Block - Monthly","charges":[{"label":"CPM Block Charge","text":"INR 22,000 / Per unit recurrence"}],"zero":false,"primaryPrice":22000},{"cat":"Account & Platform","product":"CQA Monthly Rental","sku":"PF-CQA_monthly_rental","plan":"CQA Monthly Rental - Monthly","charges":[{"label":"CQA Monthly Rental Charge","text":"INR 50,000 / Per unit recurrence"}],"zero":false,"primaryPrice":50000},{"cat":"Account & Platform","product":"CoC Dashboard Charges","sku":"PF-CoC_Dashboard_Charges","plan":"CoC Dashboard Charges - Monthly","charges":[{"label":"CoC Dashboard Charges Charge","text":"INR 48,000 / Per unit recurrence"}],"zero":false,"primaryPrice":48000},{"cat":"Account & Platform","product":"Sticky Agent Rental","sku":"PF-Sticky_Agent_Rental","plan":"Sticky Agent Rental - Monthly","charges":[{"label":"Sticky Agent Rental Charge","text":"INR 15,000 / Per unit recurrence"}],"zero":false,"primaryPrice":15000},{"cat":"Account & Platform","product":"Wrapper API Rental","sku":"PF-Wrapper_API_Rental","plan":"Wrapper API Rental - Monthly","charges":[{"label":"Wrapper API Rental Charge","text":"INR 7,000 / Per unit recurrence"}],"zero":false,"primaryPrice":7000},{"cat":"Account & Platform","product":"Dialwhom API Rental","sku":"PF-dialwhom_API_Rental","plan":"Dialwhom API Rental - Monthly","charges":[{"label":"Dialwhom API Rental Charge","text":"INR 5,000 / Per unit recurrence"}],"zero":false,"primaryPrice":5000},{"cat":"Account & Platform","product":"Report Customization","sku":"PF-report_customization","plan":"Report Customization - Monthly","charges":[{"label":"Report Customization Charge","text":"INR 15,000 / Per unit recurrence"}],"zero":false,"primaryPrice":15000},{"cat":"Account & Platform","product":"Rental Income","sku":"PF-rental_income","plan":"Rental Income - Monthly","charges":[{"label":"Rental Income Charge","text":"INR 100 / Per unit recurrence"}],"zero":false,"primaryPrice":100},{"cat":"Account & Platform","product":"Disposition","sku":"PF-disposition","plan":"Disposition - Monthly","charges":[{"label":"Disposition Charge","text":"INR 1,000 / Per unit recurrence"}],"zero":false,"primaryPrice":1000},{"cat":"Account & Platform","product":"Custom Brand","sku":"PF-custombrand","plan":"Custom Brand - Monthly","charges":[{"label":"Custom Brand Charge","text":"INR 5,000 / Per unit recurrence"}],"zero":false,"primaryPrice":5000},{"cat":"Account & Platform","product":"DG Charges","sku":"PF-dg_charges","plan":"DG Charges - Monthly","charges":[{"label":"DG Charges Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Account & Platform","product":"Live Call Dashboard","sku":"PF-live_call_dashboard","plan":"Live Call Dashboard - Monthly","charges":[{"label":"Live Call Dashboard Charge","text":"INR 2,500 / Per unit recurrence"}],"zero":false,"primaryPrice":2500},{"cat":"Account & Platform","product":"New Default Trial Flow","sku":"PF-new_default_trial_flow","plan":"New Default Trial Flow - Monthly","charges":[{"label":"New Default Trial Flow Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Account & Platform","product":"VN Mapping","sku":"PF-vn_mapping","plan":"VN Mapping - Monthly","charges":[{"label":"VN Mapping Charge","text":"INR 2,500 / Per unit recurrence"}],"zero":false,"primaryPrice":2500},{"cat":"Calling","product":"Call Charges","sku":"PF-call","plan":"Call Charges - Monthly","charges":[{"label":"Call Charges Charge","text":"INR 0.4 / 60s Pulse"}],"zero":false,"primaryPrice":0.4},{"cat":"Calling","product":"Call Charges - Landline","sku":"PF-call-landline","plan":"Call Charges - Landline - Monthly","charges":[{"label":"Call Charges - Landline Charge","text":"INR 0.5 / 60s Pulse"}],"zero":false,"primaryPrice":0.5},{"cat":"Calling","product":"Call Charges - Domestic","sku":"PF-call-domestic","plan":"Call Charges - Domestic - Monthly","charges":[{"label":"Call Charges - Domestic Charge","text":"INR 0.5 / 60s Pulse"}],"zero":false,"primaryPrice":0.5},{"cat":"Calling","product":"Call Charges - International","sku":"PF-call-international","plan":"Call Charges - International - Monthly","charges":[{"label":"Call Charges - International Charge","text":"INR 2 / 60s Pulse"}],"zero":false,"primaryPrice":2.0},{"cat":"Calling","product":"Call Charges - Mobile DID","sku":"PF-call-mobile_did","plan":"Call Charges - Mobile DID - Monthly","charges":[{"label":"Call Charges - Mobile DID Charge","text":"INR 0.75 / 60s Pulse"}],"zero":false,"primaryPrice":0.75},{"cat":"Calling","product":"Call Charges - Promotional","sku":"PF-call-promotional","plan":"Call Charges - Promotional - Monthly","charges":[{"label":"Call Charges - Promotional Charge","text":"INR 0.5 / 60s Pulse"}],"zero":false,"primaryPrice":0.5},{"cat":"Calling","product":"Call Charges - Tollfree","sku":"PF-call-tollfree","plan":"Call Charges - Tollfree - Monthly","charges":[{"label":"Call Charges - Tollfree Charge","text":"INR 0.25 / 60s Pulse"}],"zero":false,"primaryPrice":0.25},{"cat":"Calling","product":"Call Charges - Transactional","sku":"PF-call-transactional","plan":"Call Charges - Transactional - Monthly","charges":[{"label":"Call Charges - Transactional Charge","text":"INR 0.5 / 60s Pulse"}],"zero":false,"primaryPrice":0.5},{"cat":"Calling","product":"Call Charges - VoIP","sku":"PF-call-voip","plan":"Call Charges - VoIP - Monthly","charges":[{"label":"Call Charges - VoIP Charge","text":"INR 0 / 60s Pulse"}],"zero":true,"primaryPrice":0},{"cat":"Calling","product":"Exophone Channel","sku":"PF-exophone_channel","plan":"Exophone Channel - Monthly","charges":[{"label":"Exophone Channel Charge","text":"INR 400 / 60s Pulse"}],"zero":false,"primaryPrice":400},{"cat":"Call Recording & Streaming","product":"Call Recording","sku":"PF-call_recording","plan":"Call Recording - Monthly","charges":[{"label":"Call Recording Charge","text":"INR 0 / Per unit"}],"zero":true,"primaryPrice":0},{"cat":"Call Recording & Streaming","product":"Call Recording Retrieval","sku":"PF-call_recording_retrieval","plan":"Call Recording Retrieval - Monthly","charges":[{"label":"Call Recording Retrieval Charge","text":"INR 0.01 / Per unit"}],"zero":false,"primaryPrice":0.01},{"cat":"Call Recording & Streaming","product":"Call Recording Storage","sku":"PF-call_recording_storage","plan":"Call Recording Storage - Monthly","charges":[{"label":"Call Recording Storage Charge","text":"INR 0 / Per unit"}],"zero":true,"primaryPrice":0},{"cat":"Call Recording & Streaming","product":"[LIVE] Call Recording Rental","sku":"PF-call_recording_rental-LIVE","plan":"[LIVE] Call Recording Rental - Monthly","charges":[{"label":"[LIVE] Call Recording Rental Charge","text":"INR 500 / Per unit"}],"zero":false,"primaryPrice":500},{"cat":"Call Recording & Streaming","product":"[LIVE] Call Streaming","sku":"PF-call_streaming-LIVE","plan":"[LIVE] Call Streaming - Monthly","charges":[{"label":"[LIVE] Call Streaming Charge","text":"INR 0.5 / Per unit"}],"zero":false,"primaryPrice":0.5},{"cat":"Call Recording & Streaming","product":"Voice Streaming Channel","sku":"PF-voice_streaming_channel","plan":"Voice Streaming Channel - Monthly","charges":[{"label":"Voice Streaming Channel Charge","text":"INR 2,500 / Per unit"}],"zero":false,"primaryPrice":2500},{"cat":"Call Recording & Streaming","product":"IP Platform CPS","sku":"PF-ip-platform-cps","plan":"IP Platform CPS - Monthly","charges":[{"label":"IP Platform CPS Charge","text":"INR 1 / Per unit"}],"zero":false,"primaryPrice":1},{"cat":"Call Recording & Streaming","product":"IP Platform Channel","sku":"PF-ip-platform-channel","plan":"IP Platform Channel - Monthly","charges":[{"label":"IP Platform Channel Charge","text":"INR 1 / Per unit"}],"zero":false,"primaryPrice":1},{"cat":"Messaging (SMS)","product":"SMS","sku":"SMS-S","plan":"SMS - Monthly","charges":[{"label":"SMS Charge","text":"INR 0.21 / Per unit"}],"zero":false,"primaryPrice":0.21},{"cat":"Messaging (SMS)","product":"SMS OTP","sku":"PF-exoverify_sms_otp","plan":"SMS OTP - Monthly","charges":[{"label":"SMS OTP Charge","text":"INR 0.21 / Per unit"}],"zero":false,"primaryPrice":0.21},{"cat":"Messaging (SMS)","product":"Bulk Personalized SMS App","sku":"PF-bulkpersonalizedsms_app","plan":"Bulk Personalized SMS App - Monthly","charges":[{"label":"Bulk Personalized SMS App Charge","text":"INR 800 / Per unit"}],"zero":false,"primaryPrice":800},{"cat":"Messaging (SMS)","product":"Bulk Personalized SMS App Call","sku":"PF-bulkpersonalizedsms_app_call","plan":"Bulk Personalized SMS App Call - Monthly","charges":[{"label":"Bulk Personalized SMS App Call Charge","text":"INR 0 / Per unit"}],"zero":true,"primaryPrice":0},{"cat":"Messaging (SMS)","product":"URL Shortening","sku":"PF-url_shorten","plan":"URL Shortening - Monthly","charges":[{"label":"URL Shortening Charge","text":"INR 0.02 / Per unit"}],"zero":false,"primaryPrice":0.02},{"cat":"Messaging (SMS)","product":"Lead Agg With SMS App","sku":"PF-leadaggwithsms_app","plan":"Lead Agg With SMS App - Monthly","charges":[{"label":"Lead Agg With SMS App Charge","text":"INR 1,500 / Per unit"}],"zero":false,"primaryPrice":1500},{"cat":"Messaging (SMS)","product":"Lead Agg With Call SMS App","sku":"PF-leadaggwithcallsms_app","plan":"Lead Agg With Call SMS App - Monthly","charges":[{"label":"Lead Agg With Call SMS App Charge","text":"INR 2,000 / Per unit"}],"zero":false,"primaryPrice":2000},{"cat":"WhatsApp","product":"WhatsApp Conversation","sku":"PF-whats_app_converse","plan":"WhatsApp Conversation - Monthly","charges":[{"label":"WhatsApp Conversation Charge","text":"INR 0.15 / Per unit"}],"zero":false,"primaryPrice":0.15},{"cat":"WhatsApp","product":"WhatsApp Host","sku":"dats_whatsapp_host","plan":"WhatsApp Host - Monthly","charges":[{"label":"WhatsApp Host Charge","text":"INR 0 / Per unit"}],"zero":true,"primaryPrice":0},{"cat":"WhatsApp","product":"WhatsApp Rental","sku":"PF-whats_app_rental","plan":"WhatsApp Rental - Monthly","charges":[{"label":"WhatsApp Rental Charge","text":"INR 0 / Per unit"}],"zero":true,"primaryPrice":0},{"cat":"RCS","product":"RCS Host","sku":"PF-rcs_host","plan":"RCS Host - Monthly","charges":[{"label":"RCS Host Charge","text":"INR 833 / Per unit"}],"zero":false,"primaryPrice":833},{"cat":"RCS","product":"RCS Message","sku":"PF-rcs_message","plan":"RCS Message - Monthly","charges":[{"label":"RCS Message Charge","text":"INR 0.2 / Per unit"}],"zero":false,"primaryPrice":0.2},{"cat":"RCS","product":"RCS Rental","sku":"PF-rcs_rental","plan":"RCS Rental - Monthly","charges":[{"label":"RCS Rental Charge","text":"INR 3,000 / Per unit"}],"zero":false,"primaryPrice":3000},{"cat":"Voice AI","product":"Platform Usage - AI Assist","sku":"PF-platform-usage-ai-assist","plan":"Platform Usage - AI Assist - Monthly","charges":[{"label":"Platform Usage - AI Assist Charge","text":"INR 1.5 / Per unit"}],"zero":false,"primaryPrice":1.5},{"cat":"Voice AI","product":"Voice Bot","sku":"PF-voice_bot","plan":"Voice Bot - Monthly","charges":[{"label":"Voice Bot Charge","text":"INR 2.25 / Per unit"}],"zero":false,"primaryPrice":2.25},{"cat":"Voice AI","product":"Text To Speech","sku":"PF-tts","plan":"Text To Speech - Monthly","charges":[{"label":"Text To Speech Charge","text":"INR 1 / Per unit"}],"zero":false,"primaryPrice":1},{"cat":"Voice AI","product":"Voiceover","sku":"PF-voiceover","plan":"Voiceover - Monthly","charges":[{"label":"Voiceover Charge","text":"INR 600 / Per unit"}],"zero":false,"primaryPrice":600},{"cat":"Voice AI","product":"Squad Voice App","sku":"PF-squadvoice_app","plan":"Squad Voice App - Monthly","charges":[{"label":"Squad Voice App Charge","text":"INR 0 / Per unit"}],"zero":true,"primaryPrice":0},{"cat":"Users & Numbers","product":"User Rental","sku":"PF-user","plan":"User Rental - Monthly","charges":[{"label":"User Rental Charge","text":"INR 199 / Per unit recurrence"}],"zero":false,"primaryPrice":199},{"cat":"Users & Numbers","product":"User Credit Rental","sku":"PF-usercredit","plan":"User Credit Rental - Monthly","charges":[{"label":"User Credit Rental Charge","text":"INR 250 / Per unit recurrence"}],"zero":false,"primaryPrice":250},{"cat":"Users & Numbers","product":"Number Rental","sku":"PF-number","plan":"Number Rental - Monthly","charges":[{"label":"Number Rental Charge","text":"INR 499 / Per unit recurrence"}],"zero":false,"primaryPrice":499},{"cat":"Users & Numbers","product":"[LIVE] Ryng User","sku":"PF-ryng_user-LIVE","plan":"[LIVE] Ryng User - Monthly","charges":[{"label":"[LIVE] Ryng User Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Lead Assist","product":"Leadassist User","sku":"PF-leadassist_user","plan":"Leadassist User - Monthly","charges":[{"label":"Leadassist User Charge","text":"INR 0 / Per unit"}],"zero":true,"primaryPrice":0},{"cat":"Lead Assist","product":"Leadassist Greenpin Allocation","sku":"PF-leadassist_greenpin_allocation","plan":"Leadassist Greenpin Allocation - Monthly","charges":[{"label":"Leadassist Greenpin Allocation Charge","text":"INR 0.03 / Per unit"}],"zero":false,"primaryPrice":0.03},{"cat":"Lead Assist","product":"Leadassist Greenpin Recurring","sku":"PF-leadassist_greenpin_recurring","plan":"Leadassist Greenpin Recurring - Monthly","charges":[{"label":"Leadassist Greenpin Recurring Charge","text":"INR 0 / Per unit"}],"zero":true,"primaryPrice":0},{"cat":"Lead Assist","product":"Leadassist Greenpin Update Allocation","sku":"PF-leadassist_greenpin_update_allocation","plan":"Leadassist Greenpin Update Allocation - Monthly","charges":[{"label":"Leadassist Greenpin Update Allocation Charge","text":"INR 0.03 / Per unit"}],"zero":false,"primaryPrice":0.03},{"cat":"Lead Assist","product":"Leadassist Green VN Update Allocation","sku":"PF-leadassist_greenvn_update_allocation","plan":"Leadassist Green VN Update Allocation - Monthly","charges":[{"label":"Leadassist Green VN Update Allocation Charge","text":"INR 0.15 / Per unit"}],"zero":false,"primaryPrice":0.15},{"cat":"Lead Assist","product":"Leadassist Green VN Param Update Allocation","sku":"PF-leadassist_greenvn_param_update_allocation","plan":"Leadassist Green VN Param Update Allocation - Monthly","charges":[{"label":"Leadassist Green VN Param Update Allocation Charge","text":"INR 0.15 / Per unit"}],"zero":false,"primaryPrice":0.15},{"cat":"Lead Assist","product":"[LIVE] Leadassist Allocation","sku":"PF-leadassist_allocation-LIVE","plan":"[LIVE] Leadassist Allocation - Monthly","charges":[{"label":"[LIVE] Leadassist Allocation Charge","text":"INR 0.15 / Per unit"}],"zero":false,"primaryPrice":0.15},{"cat":"Lead Assist","product":"[LIVE] LeadAssist Deallocation","sku":"PF-leadassist_deallocation-LIVE","plan":"[LIVE] LeadAssist Deallocation - Monthly","charges":[{"label":"[LIVE] LeadAssist Deallocation Charge","text":"INR 30 / Per unit"}],"zero":false,"primaryPrice":30},{"cat":"Truecaller","product":"Truecaller Integration","sku":"PF-truecaller_integration","plan":"Truecaller Integration - Monthly","charges":[{"label":"Truecaller Integration Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Truecaller","product":"Truecaller Subscription","sku":"PF-truecaller_subscription","plan":"Truecaller Subscription - Monthly","charges":[{"label":"Truecaller Subscription Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Truecaller","product":"Truecaller Extra Charges","sku":"PF-truecaller_extra_charges","plan":"Truecaller Extra Charges - Monthly","charges":[{"label":"Truecaller Extra Charges Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"CRM & Helpdesk Integrations","product":"Zoho CRM App","sku":"PF-zohocrm_app","plan":"Zoho CRM App - Monthly","charges":[{"label":"Zoho CRM App Charge","text":"INR 1,500 / Per unit recurrence"}],"zero":false,"primaryPrice":1500},{"cat":"CRM & Helpdesk Integrations","product":"Zendesk Integration App","sku":"PF-zendeskintegration_app","plan":"Zendesk Integration App - Monthly","charges":[{"label":"Zendesk Integration App Charge","text":"INR 1,500 / Per unit recurrence"}],"zero":false,"primaryPrice":1500},{"cat":"CRM & Helpdesk Integrations","product":"Freshdesk Integration App","sku":"PF-freshdeskintegration_app","plan":"Freshdesk Integration App - Monthly","charges":[{"label":"Freshdesk Integration App Charge","text":"INR 1,500 / Per unit recurrence"}],"zero":false,"primaryPrice":1500},{"cat":"CRM & Helpdesk Integrations","product":"Hubspot App","sku":"PF-hubspot_app","plan":"Hubspot App - Monthly","charges":[{"label":"Hubspot App Charge","text":"INR 499 / Per unit recurrence"}],"zero":false,"primaryPrice":499},{"cat":"CRM & Helpdesk Integrations","product":"Pipedrive Integration App","sku":"PF-pipedriveintegration_app","plan":"Pipedrive Integration App - Monthly","charges":[{"label":"Pipedrive Integration App Charge","text":"INR 1,500 / Per unit recurrence"}],"zero":false,"primaryPrice":1500},{"cat":"CRM & Helpdesk Integrations","product":"Pdeals Integration App","sku":"PF-pdealsintegration_app","plan":"Pdeals Integration App - Monthly","charges":[{"label":"Pdeals Integration App Charge","text":"INR 1,500 / Per unit recurrence"}],"zero":false,"primaryPrice":1500},{"cat":"CRM & Helpdesk Integrations","product":"Shopify Integration App","sku":"PF-shopifyintegration_app","plan":"Shopify Integration App - Monthly","charges":[{"label":"Shopify Integration App Charge","text":"INR 1,500 / Per unit recurrence"}],"zero":false,"primaryPrice":1500},{"cat":"CRM & Helpdesk Integrations","product":"Vtiger Flexi App","sku":"PF-vtigerflexi_app","plan":"Vtiger Flexi App - Monthly","charges":[{"label":"Vtiger Flexi App Charge","text":"INR 1,000 / Per unit recurrence"}],"zero":false,"primaryPrice":1000},{"cat":"CRM & Helpdesk Integrations","product":"Vtiger Flexi App Call","sku":"PF-vtigerflexi_app_call","plan":"Vtiger Flexi App Call - Monthly","charges":[{"label":"Vtiger Flexi App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"CRM & Helpdesk Integrations","product":"Real Time CRM App","sku":"PF-realtimecrm_app","plan":"Real Time CRM App - Monthly","charges":[{"label":"Real Time CRM App Charge","text":"INR 500 / Per unit recurrence"}],"zero":false,"primaryPrice":500},{"cat":"CRM & Helpdesk Integrations","product":"Realtime CRM App Call","sku":"PF-realtimecrm_app_call","plan":"Realtime CRM App Call - Monthly","charges":[{"label":"Realtime CRM App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Agent On Demand App","sku":"PF-agentondemand_app","plan":"Agent On Demand App - Monthly","charges":[{"label":"Agent On Demand App Charge","text":"INR 500 / Per unit recurrence"}],"zero":false,"primaryPrice":500},{"cat":"Call-flow Apps","product":"Agent On Demand App Call","sku":"PF-agentondemand_app_call","plan":"Agent On Demand App Call - Monthly","charges":[{"label":"Agent On Demand App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Agent On Demand Call","sku":"PF-agentondemandcall_app","plan":"Agent On Demand Call - Monthly","charges":[{"label":"Agent On Demand Call Charge","text":"INR 6 / Per unit recurrence"}],"zero":false,"primaryPrice":6},{"cat":"Call-flow Apps","product":"App Builder App","sku":"PF-appbuilder_app","plan":"App Builder App - Monthly","charges":[{"label":"App Builder App Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"App Builder App Call","sku":"PF-appbuilder_app_call","plan":"App Builder App Call - Monthly","charges":[{"label":"App Builder App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Appointment Management App","sku":"PF-apptmngmt_app","plan":"Appointment Management App - Monthly","charges":[{"label":"Appointment Management App Charge","text":"INR 1,500 / Per unit recurrence"}],"zero":false,"primaryPrice":1500},{"cat":"Call-flow Apps","product":"ATIS App","sku":"PF-atis_app","plan":"ATIS App - Monthly","charges":[{"label":"ATIS App Charge","text":"INR 500 / Per unit recurrence"}],"zero":false,"primaryPrice":500},{"cat":"Call-flow Apps","product":"ATIS App Call","sku":"PF-atis_app_call","plan":"ATIS App Call - Monthly","charges":[{"label":"ATIS App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"ATSA App","sku":"PF-atsa_app","plan":"ATSA App - Monthly","charges":[{"label":"ATSA App Charge","text":"INR 1,000 / Per unit recurrence"}],"zero":false,"primaryPrice":1000},{"cat":"Call-flow Apps","product":"ATSA App Call","sku":"PF-atsa_app_call","plan":"ATSA App Call - Monthly","charges":[{"label":"ATSA App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Call Transfer App","sku":"PF-calltransfer_app","plan":"Call Transfer App - Monthly","charges":[{"label":"Call Transfer App Charge","text":"INR 499 / Per unit recurrence"}],"zero":false,"primaryPrice":499},{"cat":"Call-flow Apps","product":"Conference App","sku":"PF-conference_app","plan":"Conference App - Monthly","charges":[{"label":"Conference App Charge","text":"INR 950 / Per unit recurrence"}],"zero":false,"primaryPrice":950},{"cat":"Call-flow Apps","product":"Conference App Call","sku":"PF-conference_app_call","plan":"Conference App Call - Monthly","charges":[{"label":"Conference App Call Charge","text":"INR 0.1 / Per unit recurrence"}],"zero":false,"primaryPrice":0.1},{"cat":"Call-flow Apps","product":"Connect App","sku":"PF-connect_app","plan":"Connect App - Monthly","charges":[{"label":"Connect App Charge","text":"INR 300 / Per unit recurrence"}],"zero":false,"primaryPrice":300},{"cat":"Call-flow Apps","product":"Connect App Call","sku":"PF-connect_app_call","plan":"Connect App Call - Monthly","charges":[{"label":"Connect App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"CToC App","sku":"PF-ctoc_app","plan":"CToC App - Monthly","charges":[{"label":"CToC App Charge","text":"INR 300 / Per unit recurrence"}],"zero":false,"primaryPrice":300},{"cat":"Call-flow Apps","product":"Click To Call App Call","sku":"PF-ctoc_app_call","plan":"Click To Call App Call - Monthly","charges":[{"label":"Click To Call App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Customer Feedback App","sku":"PF-customerfeedback_app","plan":"Customer Feedback App - Monthly","charges":[{"label":"Customer Feedback App Charge","text":"INR 500 / Per unit recurrence"}],"zero":false,"primaryPrice":500},{"cat":"Call-flow Apps","product":"Customer Feedback App Call","sku":"PF-customerfeedback_app_call","plan":"Customer Feedback App Call - Monthly","charges":[{"label":"Customer Feedback App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Custom MOH App","sku":"PF-custommoh_app","plan":"Custom MOH App - Monthly","charges":[{"label":"Custom MOH App Charge","text":"INR 1,000 / Per unit recurrence"}],"zero":false,"primaryPrice":1000},{"cat":"Call-flow Apps","product":"Custom MOH App Call","sku":"PF-custommoh_app_call","plan":"Custom MOH App Call - Monthly","charges":[{"label":"Custom MOH App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Direct Connect App","sku":"PF-directconnect_app","plan":"Direct Connect App - Monthly","charges":[{"label":"Direct Connect App Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Direct Connect App Call","sku":"PF-directconnect_app_call","plan":"Direct Connect App Call - Monthly","charges":[{"label":"Direct Connect App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Food App","sku":"PF-food_app","plan":"Food App - Monthly","charges":[{"label":"Food App Charge","text":"INR 400 / Per unit recurrence"}],"zero":false,"primaryPrice":400},{"cat":"Call-flow Apps","product":"Food App Call","sku":"PF-food_app_call","plan":"Food App Call - Monthly","charges":[{"label":"Food App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Gather Passthru App","sku":"PF-gatherpassthru_app","plan":"Gather Passthru App - Monthly","charges":[{"label":"Gather Passthru App Charge","text":"INR 400 / Per unit recurrence"}],"zero":false,"primaryPrice":400},{"cat":"Call-flow Apps","product":"Gather Passthru App Call","sku":"PF-gatherpassthru_app_call","plan":"Gather Passthru App Call - Monthly","charges":[{"label":"Gather Passthru App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"IVR Blast App","sku":"PF-ivrblast_app","plan":"IVR Blast App - Monthly","charges":[{"label":"IVR Blast App Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"IVR Blast App Call","sku":"PF-ivrblast_app_call","plan":"IVR Blast App Call - Monthly","charges":[{"label":"IVR Blast App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Just Dial App","sku":"PF-justdial_app","plan":"Just Dial App - Monthly","charges":[{"label":"Just Dial App Charge","text":"INR 650 / Per unit recurrence"}],"zero":false,"primaryPrice":650},{"cat":"Call-flow Apps","product":"Justdial App Call","sku":"PF-justdial_app_call","plan":"Justdial App Call - Monthly","charges":[{"label":"Justdial App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Kreato Flexi App","sku":"PF-kreatoflexi_app","plan":"Kreato Flexi App - Monthly","charges":[{"label":"Kreato Flexi App Charge","text":"INR 1,000 / Per unit recurrence"}],"zero":false,"primaryPrice":1000},{"cat":"Call-flow Apps","product":"Kreato Flexi App Call","sku":"PF-kreatoflexi_app_call","plan":"Kreato Flexi App Call - Monthly","charges":[{"label":"Kreato Flexi App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Lead Sourcing App","sku":"PF-leadsourcing_app","plan":"Lead Sourcing App - Monthly","charges":[{"label":"Lead Sourcing App Charge","text":"INR 500 / Per unit recurrence"}],"zero":false,"primaryPrice":500},{"cat":"Call-flow Apps","product":"Lead Sourcing App Call","sku":"PF-leadsourcing_app_call","plan":"Lead Sourcing App Call - Monthly","charges":[{"label":"Lead Sourcing App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Missed Call App","sku":"PF-missedcall_app","plan":"Missed Call App - Monthly","charges":[{"label":"Missed Call App Charge","text":"INR 200 / Per unit recurrence"}],"zero":false,"primaryPrice":200},{"cat":"Call-flow Apps","product":"Missed Call App Call","sku":"PF-missedcall_app_call","plan":"Missed Call App Call - Monthly","charges":[{"label":"Missed Call App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"OBD App","sku":"PF-obd_app","plan":"OBD App - Monthly","charges":[{"label":"OBD App Charge","text":"INR 400 / Per unit recurrence"}],"zero":false,"primaryPrice":400},{"cat":"Call-flow Apps","product":"OBD App Call","sku":"PF-obd_app_call","plan":"OBD App Call - Monthly","charges":[{"label":"OBD App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Passthru Missed Call App","sku":"PF-passthrumissedcall_app","plan":"Passthru Missed Call App - Monthly","charges":[{"label":"Passthru Missed Call App Charge","text":"INR 300 / Per unit recurrence"}],"zero":false,"primaryPrice":300},{"cat":"Call-flow Apps","product":"Passthru Missed Call App Call","sku":"PF-passthrumissedcall_app_call","plan":"Passthru Missed Call App Call - Monthly","charges":[{"label":"Passthru Missed Call App Call Charge","text":"INR 0.1 / Per unit recurrence"}],"zero":false,"primaryPrice":0.1},{"cat":"Call-flow Apps","product":"Phone A Friend App","sku":"PF-phoneafriend_app","plan":"Phone A Friend App - Monthly","charges":[{"label":"Phone A Friend App Charge","text":"INR 500 / Per unit recurrence"}],"zero":false,"primaryPrice":500},{"cat":"Call-flow Apps","product":"Phone A Friend App Call","sku":"PF-phoneafriend_app_call","plan":"Phone A Friend App Call - Monthly","charges":[{"label":"Phone A Friend App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Shift App","sku":"PF-shift_app","plan":"Shift App - Monthly","charges":[{"label":"Shift App Charge","text":"INR 500 / Per unit recurrence"}],"zero":false,"primaryPrice":500},{"cat":"Call-flow Apps","product":"Shift App Call","sku":"PF-shift_app_call","plan":"Shift App Call - Monthly","charges":[{"label":"Shift App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Signup Verification App","sku":"PF-signupverification_app","plan":"Signup Verification App - Monthly","charges":[{"label":"Signup Verification App Charge","text":"INR 699 / Per unit recurrence"}],"zero":false,"primaryPrice":699},{"cat":"Call-flow Apps","product":"Signup Verification App Call","sku":"PF-signupverification_app_call","plan":"Signup Verification App Call - Monthly","charges":[{"label":"Signup Verification App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Squad Voice App","sku":"PF-squadvoice_app","plan":"Squad Voice App - Monthly","charges":[{"label":"Squad Voice App Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Timing App","sku":"PF-timing_app","plan":"Timing App - Monthly","charges":[{"label":"Timing App Charge","text":"INR 400 / Per unit recurrence"}],"zero":false,"primaryPrice":400},{"cat":"Call-flow Apps","product":"Timing App Call","sku":"PF-timing_app_call","plan":"Timing App Call - Monthly","charges":[{"label":"Timing App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0},{"cat":"Call-flow Apps","product":"Transaction Auth App","sku":"PF-transactionauth_app","plan":"Transaction Auth App - Monthly","charges":[{"label":"Transaction Auth App Charge","text":"INR 599 / Per unit recurrence"}],"zero":false,"primaryPrice":599},{"cat":"Call-flow Apps","product":"Transaction Auth App Call","sku":"PF-transactionauth_app_call","plan":"Transaction Auth App Call - Monthly","charges":[{"label":"Transaction Auth App Call Charge","text":"INR 0 / Per unit recurrence"}],"zero":true,"primaryPrice":0}];
+
+  const CAT_COLOR = {
+    'Account & Platform':'primary','Calling':'info','Call Recording & Streaming':'secondary',
+    'Messaging (SMS)':'secondary','WhatsApp':'success','RCS':'default','Voice AI':'primary',
+    'Users & Numbers':'primary','Lead Assist':'default','Truecaller':'default',
+    'CRM & Helpdesk Integrations':'info','Call-flow Apps':'default'
+  };
+
+  const cats = {};
+  DATA.forEach(r => { cats[r.cat] = (cats[r.cat]||0) + 1; });
+  const catList = Object.keys(cats).sort((a,b) => cats[b]-cats[a]);
+  const zeroCount = DATA.filter(r => r.zero).length;
+
+  const filterRow = document.getElementById('filter-row');
+  filterRow.innerHTML = `<button class="filter-chip" data-cat="__all__" aria-pressed="true">All <span class="n">${DATA.length}</span></button>` +
+    catList.map(c => `<button class="filter-chip" data-cat="${c}" aria-pressed="false">${c} <span class="n">${cats[c]}</span></button>`).join('') +
+    `<button class="filter-chip" data-flag="true" data-cat="__zero__" aria-pressed="false">Not priced <span class="n">${zeroCount}</span></button>`;
+
+  let activeCat = '__all__';
+  let activeZeroOnly = false;
+  let query = '';
+  let sortDir = null;
+
+  function matches(r){
+    if (activeZeroOnly && !r.zero) return false;
+    if (activeCat !== '__all__' && r.cat !== activeCat) return false;
+    if (query){
+      const hay = (r.product + ' ' + r.plan + ' ' + r.sku + ' ' + r.charges.map(c=>c.label).join(' ')).toLowerCase();
+      if (!hay.includes(query)) return false;
+    }
+    return true;
+  }
+
+  const rowsEl = document.getElementById('rows');
+  const emptyEl = document.getElementById('empty');
+  const countEl = document.getElementById('result-count');
+
+  function render(){
+    let filtered = DATA.filter(matches);
+    if (sortDir){
+      filtered = filtered.slice().sort((a,b) => sortDir === 'asc' ? a.primaryPrice-b.primaryPrice : b.primaryPrice-a.primaryPrice);
+    }
+    countEl.innerHTML = `Showing <b>${filtered.length}</b> of <b>${DATA.length}</b> SKUs`;
+    emptyEl.hidden = filtered.length > 0;
+
+    rowsEl.innerHTML = filtered.map((r, i) => {
+      const chipColor = CAT_COLOR[r.cat] || 'default';
+      const first = r.charges[0];
+      const multi = r.charges.length > 1 ? `<span class="multi">+${r.charges.length-1}</span>` : '';
+      const priceDisplay = r.zero
+        ? `<span style="color:var(--tonal-warning-text);">Not priced</span>`
+        : first.text.split('/')[0].trim();
+      const detailRows = r.charges.map(c => `<div class="charge-line"><span class="k">${c.label}</span><span class="mono">${c.text}</span></div>`).join('');
+      return `
+        <div class="row" data-idx="${i}">
+          <button class="row-main" aria-expanded="false">
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+            <span class="cell-product">
+              <span class="nm">${r.product}</span>
+              <span class="sku">${r.sku}</span>
+            </span>
+            <span class="cell-plan">${r.plan}</span>
+            <span class="cell-price mono">${priceDisplay}${multi}</span>
+          </button>
+          <div class="row-detail">
+            ${detailRows}
+            <div style="margin-top:8px;"><span class="signal-chip c-${chipColor}">${r.cat}</span></div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  filterRow.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-chip');
+    if (!btn) return;
+    const cat = btn.dataset.cat;
+    if (cat === '__zero__'){
+      activeZeroOnly = !activeZeroOnly;
+      btn.setAttribute('aria-pressed', String(activeZeroOnly));
+    } else {
+      activeCat = cat;
+      filterRow.querySelectorAll('.filter-chip[data-cat]:not([data-flag])').forEach(b =>
+        b.setAttribute('aria-pressed', String(b.dataset.cat === cat)));
+    }
+    render();
+  });
+
+  document.getElementById('search').addEventListener('input', (e) => {
+    query = e.target.value.trim().toLowerCase();
+    render();
+  });
+
+  const sortBtn = document.getElementById('sort-price');
+  sortBtn.addEventListener('click', () => {
+    sortDir = sortDir === null ? 'desc' : sortDir === 'desc' ? 'asc' : null;
+    sortBtn.classList.toggle('active', sortDir !== null);
+    sortBtn.classList.toggle('desc', sortDir === 'desc');
+    render();
+  });
+
+  rowsEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.row-main');
+    if (!btn) return;
+    const row = btn.closest('.row');
+    const open = row.classList.toggle('expanded');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  render();
+})();
+</script>

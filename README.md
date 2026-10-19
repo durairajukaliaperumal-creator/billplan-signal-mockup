@@ -14,6 +14,14 @@ Toggle between "Today's live page" (reference screenshot) and "Zuora UAT" (the r
 
 Alternative layout — every category and every SKU visible on the page at once as a masonry grid of boxes, no click-to-expand or jump-nav required. Trade-off: denser page, more scrolling than clicking.
 
+**At real scale (130 SKUs):** https://durairajukaliaperumal-creator.github.io/billplan-signal-mockup/at-scale.html
+
+The legacy page hard-codes 12 SKUs. A real enterprise Exotel account can have 100+ active rate plans across a dozen product families — at that scale, fixed category cards stop working. This view uses a searchable, filterable list instead (category breakdown and SKU names reflect a real account's actual scale; **prices are hand-picked illustrative examples, not any real customer's billing** — see caveat below).
+
+## Brand color
+
+Accent color (`#0074E8`) and the "flag"/attention color were pulled directly from `exotel.com`'s own production CSS rather than guessed — the Exotel wordmark itself is a flat charcoal (`#231F20`) with no brand hue of its own, so the blue is what's actually used site-wide as the accent.
+
 ## Context
 
 - PRD: [Bill Plan Page — Obelix Billix → Zuora Migration](https://exotel.atlassian.net/wiki/spaces/BIL/pages/2107277599/PRD+Bill+Plan+Page+Obelix+Billix+Zuora+Migration)
@@ -21,5 +29,5 @@ Alternative layout — every category and every SKU visible on the page at once 
 
 ## What's real vs. illustrative
 
-- **Real**: Zuora product/rate-plan/charge structure and list prices (pulled live from tenant 10004316, 10 Oct 2026), Signal component props/variants (pulled live from the Signal MCP).
-- **Not real**: any specific customer's subscribed plan — these are catalog list prices, not one account's negotiated rate. The exact brand hex for Signal's `palette.primary.*` is also approximated (resolved at runtime from the live theme, not exposed as static text by the docs server).
+- **Real**: Zuora product/rate-plan/charge structure and list prices on the first two pages (pulled live from UAT tenant 10004316, 10 Oct 2026), Signal component props/variants (pulled live from the Signal MCP), Exotel's accent color (pulled from `exotel.com`'s own CSS).
+- **Not real**: any specific customer's subscribed plan on the first two pages — these are catalog list prices, not one account's negotiated rate. The `at-scale.html` page's category breakdown and SKU count are modeled on one real production account's actual scale, but every price shown there is a hand-authored illustrative example — not that account's or any customer's actual billing.

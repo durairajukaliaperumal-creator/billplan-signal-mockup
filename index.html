@@ -17,9 +17,9 @@
     --mono: "IBM Plex Mono", ui-monospace, monospace;
 
     /* palette.primary.* */
-    --primary-main:#2454FF; --primary-light:#6D93FF; --primary-dark:#0E3ACC; --primary-contrastText:#FFFFFF;
+    --primary-main:#0074E8; --primary-light:#3D9BF0; --primary-dark:#00539E; --primary-contrastText:#FFFFFF;
     /* palette.{success,warning,error,info}.main — MUI standard semantics, per Signal "uses MUI semantic badge colors" */
-    --success-main:#2E7D32; --warning-main:#ED6C02; --error-main:#D32F2F; --info-main:#0288D1;
+    --success-main:#2E7D32; --warning-main:#0074E8; --error-main:#D32F2F; --info-main:#0288D1;
     --secondary-main:#6C4CD6;
 
     /* palette.text.* / background.* / divider / action.* */
@@ -36,7 +36,7 @@
     /* tonal.<color>.{bg,text} — light mode: solid pastel bg + saturated text (resolveTonalColor) */
     --tonal-primary-bg:#E8EDFF; --tonal-primary-text:#1A3FCC;
     --tonal-success-bg:#E6F4E8; --tonal-success-text:#1E5E24;
-    --tonal-warning-bg:#FFF1E0; --tonal-warning-text:#B4590A;
+    --tonal-warning-bg:#E3F2FD; --tonal-warning-text:#00539E;
     --tonal-error-bg:#FBE9E9;   --tonal-error-text:#A32424;
     --tonal-info-bg:#E3F2FB;    --tonal-info-text:#0A6FA8;
     --tonal-secondary-bg:#EEE9FB; --tonal-secondary-text:#4A33A8;
@@ -50,8 +50,8 @@
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --primary-main:#7C9DFF; --primary-light:#A9C0FF; --primary-dark:#3D5FE0; --primary-contrastText:#0B1220;
-      --success-main:#6FCF7E; --warning-main:#F2A94E; --error-main:#F18686; --info-main:#5FC1F2; --secondary-main:#B6A2F7;
+      --primary-main:#5CA8F2; --primary-light:#8BC4F7; --primary-dark:#1B6FC2; --primary-contrastText:#0B1220;
+      --success-main:#6FCF7E; --warning-main:#5CA8F2; --error-main:#F18686; --info-main:#5FC1F2; --secondary-main:#B6A2F7;
       --text-primary: rgba(236,239,245,0.94); --text-secondary: rgba(236,239,245,0.66); --text-disabled: rgba(236,239,245,0.38);
       --background-default:#0B0E14; --background-paper:#121722;
       --divider: rgba(236,239,245,0.12); --action-hover: rgba(236,239,245,0.06);
@@ -59,7 +59,7 @@
       /* dark mode tonal = alpha-tinted (per "dark uses alpha tonalSurface") */
       --tonal-primary-bg: rgba(124,157,255,0.16); --tonal-primary-text:#AEC2FF;
       --tonal-success-bg: rgba(111,207,126,0.16); --tonal-success-text:#9BE0A8;
-      --tonal-warning-bg: rgba(242,169,78,0.18);  --tonal-warning-text:#F6C083;
+      --tonal-warning-bg: rgba(92,168,242,0.18);  --tonal-warning-text:#BBDCFA;
       --tonal-error-bg: rgba(241,134,134,0.16);   --tonal-error-text:#F7B0B0;
       --tonal-info-bg: rgba(95,193,242,0.16);     --tonal-info-text:#A7DEF7;
       --tonal-secondary-bg: rgba(182,162,247,0.18); --tonal-secondary-text:#D2C4FA;
@@ -68,15 +68,15 @@
     }
   }
   :root[data-theme="dark"]{
-    --primary-main:#7C9DFF; --primary-light:#A9C0FF; --primary-dark:#3D5FE0; --primary-contrastText:#0B1220;
-    --success-main:#6FCF7E; --warning-main:#F2A94E; --error-main:#F18686; --info-main:#5FC1F2; --secondary-main:#B6A2F7;
+    --primary-main:#5CA8F2; --primary-light:#8BC4F7; --primary-dark:#1B6FC2; --primary-contrastText:#0B1220;
+    --success-main:#6FCF7E; --warning-main:#5CA8F2; --error-main:#F18686; --info-main:#5FC1F2; --secondary-main:#B6A2F7;
     --text-primary: rgba(236,239,245,0.94); --text-secondary: rgba(236,239,245,0.66); --text-disabled: rgba(236,239,245,0.38);
     --background-default:#0B0E14; --background-paper:#121722;
     --divider: rgba(236,239,245,0.12); --action-hover: rgba(236,239,245,0.06);
     --surface-0:#0B0E14; --surface-1:#121722; --surface-2:#171D2B;
     --tonal-primary-bg: rgba(124,157,255,0.16); --tonal-primary-text:#AEC2FF;
     --tonal-success-bg: rgba(111,207,126,0.16); --tonal-success-text:#9BE0A8;
-    --tonal-warning-bg: rgba(242,169,78,0.18);  --tonal-warning-text:#F6C083;
+    --tonal-warning-bg: rgba(92,168,242,0.18);  --tonal-warning-text:#BBDCFA;
     --tonal-error-bg: rgba(241,134,134,0.16);   --tonal-error-text:#F7B0B0;
     --tonal-info-bg: rgba(95,193,242,0.16);     --tonal-info-text:#A7DEF7;
     --tonal-secondary-bg: rgba(182,162,247,0.18); --tonal-secondary-text:#D2C4FA;
@@ -117,8 +117,8 @@
     font-family:var(--font); font-weight:600; font-size:12.5px; color:var(--text-secondary);
     background:var(--surface-1); border:1px solid var(--divider); border-radius:999px; padding:6px 12px 6px 8px;
     transition:background .15s ease, color .15s ease, border-color .15s ease; }
-  .cat-nav button .dot{ width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .cat-nav button .dot svg{ width:10px; height:10px; }
+  .cat-nav button .dot{ width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .cat-nav button .dot svg{ width:15px; height:15px; }
   .cat-nav button:hover{ border-color:var(--primary-main); }
   .cat-nav button[aria-current="true"]{ background:var(--primary-main); color:var(--primary-contrastText); border-color:var(--primary-main); }
   .cat-nav button[aria-current="true"] .dot{ background:rgba(255,255,255,0.25) !important; color:inherit !important; }
@@ -153,8 +153,8 @@
   .signal-card-outlined{ background:var(--surface-1); border:1px solid var(--divider); border-radius:var(--radius);
     overflow:hidden; scroll-margin-top:118px; }
   .cat-card-head{ display:flex; align-items:center; gap:10px; padding:14px 16px 12px; }
-  .cat-icon{ width:30px; height:30px; border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-  .cat-icon svg{ width:16px; height:16px; }
+  .cat-icon{ width:42px; height:42px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .cat-icon svg{ width:24px; height:24px; }
   .cat-card-head .meta{ min-width:0; }
   .cat-card-head .meta .t-caption{ margin-top:1px; }
 
@@ -226,7 +226,7 @@
     <div class="page-header">
       <div class="heading-block">
         <h1 class="t-title3">Bill Plan</h1>
-        <p class="t-body2">Rebuilt against the Signal design system (Button, Chip, Alert, Card, Accordion, Tabs, PageHeader tokens) · pricing pulled live from Zuora UAT, tenant 10004316 · <a href="box.html" style="color:var(--primary-main); font-weight:600; text-decoration:none;">Switch to box view</a></p>
+        <p class="t-body2">Rebuilt against the Signal design system (Button, Chip, Alert, Card, Accordion, Tabs, PageHeader tokens) · pricing pulled live from Zuora UAT, tenant 10004316 · <a href="box.html" style="color:var(--primary-main); font-weight:600; text-decoration:none;">Switch to box view</a> · <a href="at-scale.html" style="color:var(--primary-main); font-weight:600; text-decoration:none;">See it at real scale (130 SKUs)</a></p>
       </div>
       <div class="signal-tabs-button" role="tablist" aria-label="Data source view">
         <button role="tab" id="tab-legacy" aria-selected="false">Today's live page</button>

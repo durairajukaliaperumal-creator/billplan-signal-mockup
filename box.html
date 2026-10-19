@@ -11,8 +11,8 @@
   :root{
     --font: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
     --mono: "IBM Plex Mono", ui-monospace, monospace;
-    --primary-main:#2454FF; --primary-light:#6D93FF; --primary-dark:#0E3ACC; --primary-contrastText:#FFFFFF;
-    --success-main:#2E7D32; --warning-main:#ED6C02; --error-main:#D32F2F; --info-main:#0288D1;
+    --primary-main:#0074E8; --primary-light:#3D9BF0; --primary-dark:#00539E; --primary-contrastText:#FFFFFF;
+    --success-main:#2E7D32; --warning-main:#0074E8; --error-main:#D32F2F; --info-main:#0288D1;
     --secondary-main:#6C4CD6;
     --text-primary: rgba(16,20,28,0.92);
     --text-secondary: rgba(16,20,28,0.62);
@@ -23,7 +23,7 @@
     --surface-0:#F4F5F8; --surface-1:#FFFFFF; --surface-2:#FFFFFF;
     --tonal-primary-bg:#E8EDFF; --tonal-primary-text:#1A3FCC;
     --tonal-success-bg:#E6F4E8; --tonal-success-text:#1E5E24;
-    --tonal-warning-bg:#FFF1E0; --tonal-warning-text:#B4590A;
+    --tonal-warning-bg:#E3F2FD; --tonal-warning-text:#00539E;
     --tonal-error-bg:#FBE9E9;   --tonal-error-text:#A32424;
     --tonal-info-bg:#E3F2FB;    --tonal-info-text:#0A6FA8;
     --tonal-secondary-bg:#EEE9FB; --tonal-secondary-text:#4A33A8;
@@ -34,15 +34,15 @@
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --primary-main:#7C9DFF; --primary-light:#A9C0FF; --primary-dark:#3D5FE0; --primary-contrastText:#0B1220;
-      --success-main:#6FCF7E; --warning-main:#F2A94E; --error-main:#F18686; --info-main:#5FC1F2; --secondary-main:#B6A2F7;
+      --primary-main:#5CA8F2; --primary-light:#8BC4F7; --primary-dark:#1B6FC2; --primary-contrastText:#0B1220;
+      --success-main:#6FCF7E; --warning-main:#5CA8F2; --error-main:#F18686; --info-main:#5FC1F2; --secondary-main:#B6A2F7;
       --text-primary: rgba(236,239,245,0.94); --text-secondary: rgba(236,239,245,0.66); --text-disabled: rgba(236,239,245,0.38);
       --background-default:#0B0E14; --background-paper:#121722;
       --divider: rgba(236,239,245,0.12); --action-hover: rgba(236,239,245,0.06);
       --surface-0:#0B0E14; --surface-1:#121722; --surface-2:#171D2B;
       --tonal-primary-bg: rgba(124,157,255,0.16); --tonal-primary-text:#AEC2FF;
       --tonal-success-bg: rgba(111,207,126,0.16); --tonal-success-text:#9BE0A8;
-      --tonal-warning-bg: rgba(242,169,78,0.18);  --tonal-warning-text:#F6C083;
+      --tonal-warning-bg: rgba(92,168,242,0.18);  --tonal-warning-text:#BBDCFA;
       --tonal-error-bg: rgba(241,134,134,0.16);   --tonal-error-text:#F7B0B0;
       --tonal-info-bg: rgba(95,193,242,0.16);     --tonal-info-text:#A7DEF7;
       --tonal-secondary-bg: rgba(182,162,247,0.18); --tonal-secondary-text:#D2C4FA;
@@ -51,15 +51,15 @@
     }
   }
   :root[data-theme="dark"]{
-    --primary-main:#7C9DFF; --primary-light:#A9C0FF; --primary-dark:#3D5FE0; --primary-contrastText:#0B1220;
-    --success-main:#6FCF7E; --warning-main:#F2A94E; --error-main:#F18686; --info-main:#5FC1F2; --secondary-main:#B6A2F7;
+    --primary-main:#5CA8F2; --primary-light:#8BC4F7; --primary-dark:#1B6FC2; --primary-contrastText:#0B1220;
+    --success-main:#6FCF7E; --warning-main:#5CA8F2; --error-main:#F18686; --info-main:#5FC1F2; --secondary-main:#B6A2F7;
     --text-primary: rgba(236,239,245,0.94); --text-secondary: rgba(236,239,245,0.66); --text-disabled: rgba(236,239,245,0.38);
     --background-default:#0B0E14; --background-paper:#121722;
     --divider: rgba(236,239,245,0.12); --action-hover: rgba(236,239,245,0.06);
     --surface-0:#0B0E14; --surface-1:#121722; --surface-2:#171D2B;
     --tonal-primary-bg: rgba(124,157,255,0.16); --tonal-primary-text:#AEC2FF;
     --tonal-success-bg: rgba(111,207,126,0.16); --tonal-success-text:#9BE0A8;
-    --tonal-warning-bg: rgba(242,169,78,0.18);  --tonal-warning-text:#F6C083;
+    --tonal-warning-bg: rgba(92,168,242,0.18);  --tonal-warning-text:#BBDCFA;
     --tonal-error-bg: rgba(241,134,134,0.16);   --tonal-error-text:#F7B0B0;
     --tonal-info-bg: rgba(95,193,242,0.16);     --tonal-info-text:#A7DEF7;
     --tonal-secondary-bg: rgba(182,162,247,0.18); --tonal-secondary-text:#D2C4FA;
@@ -112,8 +112,8 @@
     margin:0 0 14px; background:var(--surface-1); border:1px solid var(--divider); border-radius:var(--radius);
     overflow:hidden; }
   .cat-card-head{ display:flex; align-items:center; gap:9px; padding:13px 15px 11px; }
-  .cat-icon{ width:28px; height:28px; border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-  .cat-icon svg{ width:15px; height:15px; }
+  .cat-icon{ width:40px; height:40px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .cat-icon svg{ width:22px; height:22px; }
   .cat-card-head .meta{ min-width:0; }
 
   .signal-alert-inline{ margin:0 15px 9px; padding:7px 10px; border-radius:6px; font-size:11px;
@@ -165,7 +165,7 @@
   <div class="page-header">
     <div class="heading-block">
       <h1 class="t-title3">Bill Plan — box view</h1>
-      <p class="t-body2">Every product and SKU visible on the page at once — no click-to-expand, no jump-nav. <span class="layout-switch">· <a href="index.html">Switch to nav + accordion layout</a></span></p>
+      <p class="t-body2">Every product and SKU visible on the page at once — no click-to-expand, no jump-nav. <span class="layout-switch">· <a href="index.html">Switch to nav + accordion layout</a> · <a href="at-scale.html">See it at real scale (130 SKUs)</a></span></p>
     </div>
     <div class="signal-tabs-button" role="tablist" aria-label="Data source view">
       <button role="tab" id="tab-legacy" aria-selected="false">Today's live page</button>
