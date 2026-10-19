@@ -170,6 +170,9 @@
   .accordion-summary:focus-visible{ outline:2px solid var(--primary-main); outline-offset:-2px; }
   .expand-icon{ width:16px; height:16px; color:var(--text-secondary); flex-shrink:0; transition:transform .15s ease; }
   .signal-accordion.expanded .expand-icon{ transform:rotate(180deg); }
+  .row-icon{ width:30px; height:30px; border-radius:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .row-icon svg{ width:17px; height:17px; }
+  .row-desc{ display:block; opacity:.85; }
   .summary-text{ flex:1; min-width:0; }
   .summary-price{ text-align:right; white-space:nowrap; }
   .summary-price .amt{ font-size:13.5px; font-weight:600; }
@@ -303,70 +306,70 @@
   // Real pull from Zuora UAT (tenant 10004316), 10 Oct 2026 — unchanged from the prior review, restyled only.
   const CATS = [
     { key:'platform', title:'Account & Platform', sub:'Product PF-accountrental · 3 rate-plan variants', icon:'platform', rows:[
-      { nm:'Account Rental', sub:'Recurring · Monthly', price:'₹1,800', unit:'/month', zero:false,
+      { nm:'Account Rental', desc:'Flat monthly fee to keep the Exotel account active.', sub:'Recurring · Monthly', price:'₹1,800', unit:'/month', zero:false,
         plan:'Account Rental – Monthly', charge:'Platform::Recurring::Account Rental Monthly Charge',
         tiers:[['Flat','₹1,800.00 / month']],
         note:'The "Monthly Prorated" and "Daily" variants of this product are both ₹0 in UAT.' }
     ]},
     { key:'voice', title:'Calling', sub:'Product PF-call · 9 rate-plan variants, all ₹0', icon:'voice',
       flag:'No pulse/tier variant of Call Charges has a non-zero price loaded in this UAT tenant.', rows:[
-      { nm:'Call Charges', sub:'Usage · 60s pulse, tiered', price:'₹0.00', unit:'/min', zero:true,
+      { nm:'Call Charges', desc:'Per-minute usage charge for outbound and inbound calls.', sub:'Usage · 60s pulse, tiered', price:'₹0.00', unit:'/min', zero:true,
         plan:'Call Charges (60s Pulse) – Tiered', charge:'Voice::Usage::Call Charges',
         tiers:[['0 – 999,999 min','₹0.00'],['1,000,000+ min','₹0.00']],
         note:'Same ₹0 on the 30s and 15s pulse variants, and the non-tiered "60s Pulse" plan.' }
     ]},
     { key:'sms', title:'Messaging (SMS)', sub:'Product PF-sms · 2 rate-plan variants', icon:'sms',
       flag:'Zuora models 2 charges here (SMS, SMS DLT) — the old page\'s Incoming / Transactional / Promotional split doesn\'t exist in this catalog.', rows:[
-      { nm:'SMS', sub:'Usage · flat, not tiered', price:'₹0.131', unit:'/sms', zero:false,
+      { nm:'SMS', desc:'Per-message charge for standard SMS delivery.', sub:'Usage · flat, not tiered', price:'₹0.131', unit:'/sms', zero:false,
         plan:'SMS – Usage', charge:'SMS::Usage::SMS', tiers:[['Flat','₹0.131 / sms']] },
-      { nm:'SMS DLT', sub:'Usage · flat, not tiered', price:'₹0.025', unit:'/sms', zero:false,
+      { nm:'SMS DLT', desc:'Per-message regulatory (DLT) compliance surcharge on SMS.', sub:'Usage · flat, not tiered', price:'₹0.025', unit:'/sms', zero:false,
         plan:'SMS – Usage', charge:'SMS::Usage::SMS DLT', tiers:[['Flat','₹0.025 / sms']],
         note:'The "Tiered" variant carries identical values on both tiers — tiering isn\'t differentiating price yet.' }
     ]},
     { key:'wa', title:'WhatsApp', sub:'Products PF-whats_app_converse · rental · host', icon:'wa', rows:[
-      { nm:'Conversation — Marketing', sub:'Usage · Meta category', price:'₹0.19', unit:'/conv.', zero:false,
+      { nm:'Conversation — Marketing', desc:'Meta-billed charge for WhatsApp marketing-template conversations.', sub:'Usage · Meta category', price:'₹0.19', unit:'/conv.', zero:false,
         plan:'WhatsApp Conversation – Usage', charge:'WhatsApp::Usage::WhatsApp Marketing', tiers:[['Flat','₹0.19 / conversation']] },
-      { nm:'Conversation — Utility', sub:'Usage · Meta category', price:'₹0.131', unit:'/conv.', zero:false,
+      { nm:'Conversation — Utility', desc:'Meta-billed charge for WhatsApp utility/update conversations.', sub:'Usage · Meta category', price:'₹0.131', unit:'/conv.', zero:false,
         plan:'WhatsApp Conversation – Usage', charge:'WhatsApp::Usage::WhatsApp Utility', tiers:[['Flat','₹0.131 / conversation']] },
-      { nm:'Conversation — Service', sub:'Usage · Meta category', price:'₹0.131', unit:'/conv.', zero:false,
+      { nm:'Conversation — Service', desc:'Meta-billed charge for customer-initiated WhatsApp conversations.', sub:'Usage · Meta category', price:'₹0.131', unit:'/conv.', zero:false,
         plan:'WhatsApp Conversation – Usage', charge:'WhatsApp::Usage::WhatsApp Service', tiers:[['Flat','₹0.131 / conversation']] },
-      { nm:'Conversation — Authentication', sub:'Usage · Meta category', price:'₹0.12', unit:'/conv.', zero:false,
+      { nm:'Conversation — Authentication', desc:'Meta-billed charge for WhatsApp OTP/authentication conversations.', sub:'Usage · Meta category', price:'₹0.12', unit:'/conv.', zero:false,
         plan:'WhatsApp Conversation – Usage', charge:'WhatsApp::Usage::WhatsApp Authentication', tiers:[['Flat','₹0.12 / conversation']],
         note:'The "Extended Usage" variant (Authentication-International, API) is ₹0 — not priced yet.' },
-      { nm:'Monthly rental', sub:'Recurring', price:'₹0.00', unit:'/month', zero:true,
+      { nm:'Monthly rental', desc:'Flat monthly fee for WhatsApp Business platform access.', sub:'Recurring', price:'₹0.00', unit:'/month', zero:true,
         plan:'WhatsApp Rental – Monthly', charge:'WhatsApp::Recurring::WhatsApp Rental Monthly Charge', tiers:[['Flat','₹0.00']] },
-      { nm:'Hosting setup', sub:'Recurring', price:'₹0.00', unit:'/month', zero:true,
+      { nm:'Hosting setup', desc:'One-time fee to onboard a WhatsApp Business number.', sub:'Recurring', price:'₹0.00', unit:'/month', zero:true,
         plan:'WhatsApp Host – Monthly', charge:'WhatsApp::Recurring::WhatsApp Host Daily Charge', tiers:[['Flat','₹0.00']] }
     ]},
     { key:'rcs', title:'RCS', sub:'Products PF-rcs_host · message · rental', icon:'rcs', rows:[
-      { nm:'RCS Message — Text w/ brand', sub:'Usage', price:'₹1.00', unit:'/msg', zero:false,
+      { nm:'RCS Message — Text w/ brand', desc:'Per-message charge for branded RCS text messages.', sub:'Usage', price:'₹1.00', unit:'/msg', zero:false,
         plan:'RCS Message – Usage', charge:'Platform::Usage::RCS Message Text With Brand', tiers:[['Flat','₹1.00 / message']],
         note:'All 4 RCS Message charges price an identical flat ₹1.00 — reads like a placeholder, not negotiated pricing.' },
-      { nm:'RCS Message — Rich content', sub:'Usage', price:'₹1.00', unit:'/msg', zero:false,
+      { nm:'RCS Message — Rich content', desc:'Per-message charge for RCS messages with images or carousels.', sub:'Usage', price:'₹1.00', unit:'/msg', zero:false,
         plan:'RCS Message – Usage', charge:'Platform::Usage::RCS Message Rich Content', tiers:[['Flat','₹1.00 / message']] },
-      { nm:'RCS Message — P2A conversation', sub:'Usage', price:'₹1.00', unit:'/conv.', zero:false,
+      { nm:'RCS Message — P2A conversation', desc:'Per-conversation charge, person-to-application RCS chats.', sub:'Usage', price:'₹1.00', unit:'/conv.', zero:false,
         plan:'RCS Message – Usage', charge:'Platform::Usage::RCS Message P2A', tiers:[['Flat','₹1.00 / conversation']] },
-      { nm:'RCS Message — A2P conversation', sub:'Usage', price:'₹1.00', unit:'/conv.', zero:false,
+      { nm:'RCS Message — A2P conversation', desc:'Per-conversation charge, application-to-person RCS chats.', sub:'Usage', price:'₹1.00', unit:'/conv.', zero:false,
         plan:'RCS Message – Usage', charge:'Platform::Usage::RCS Message A2P', tiers:[['Flat','₹1.00 / conversation']] },
-      { nm:'Brand registration (Host)', sub:'Recurring — billing period is "Month" in Zuora', price:'₹0.00', unit:'/mo', zero:true,
+      { nm:'Brand registration (Host)', desc:'Annual fee to register a brand for RCS messaging.', sub:'Recurring — billing period is "Month" in Zuora', price:'₹0.00', unit:'/mo', zero:true,
         plan:'RCS Host – Monthly', charge:'RCS::Recurring::RCS Host Monthly Charge', tiers:[['Flat','₹0.00']],
         note:'The old page calls this "Annual" — Zuora\'s RCS Host product only has Month-cadence rate plans.' },
-      { nm:'Platform rental', sub:'Recurring · Monthly', price:'₹0.00', unit:'/month', zero:true,
+      { nm:'Platform rental', desc:'Flat monthly fee for RCS platform access.', sub:'Recurring · Monthly', price:'₹0.00', unit:'/month', zero:true,
         plan:'RCS Rental – Monthly', charge:'RCS::Recurring::RCS Rental', tiers:[['Flat','₹0.00']] }
     ]},
     { key:'users', title:'Users & Seats', sub:'Product PF-user · 6 rate-plan variants', icon:'users', rows:[
-      { nm:'User seats', sub:'Recurring · Monthly, flat (not tiered)', price:'₹2,200', unit:'/user/mo', zero:false,
+      { nm:'User seats', desc:'Per-seat monthly fee for each additional team member.', sub:'Recurring · Monthly, flat (not tiered)', price:'₹2,200', unit:'/user/mo', zero:false,
         plan:'User Rental – Monthly', charge:'Platform::Recurring::User Rental Monthly Charge',
         tiers:[['Flat','₹2,200.00 / user / month']],
         note:'"User Rental – Monthly – Tiered" is the structural match for the old "3 free, ₹199 after" plan, but both its tiers price at ₹0 in UAT.' }
     ]},
     { key:'num', title:'Numbers', sub:'Product PF-number · 11 rate-plan variants, all ₹0', icon:'num',
       flag:'None of Number Rental\'s 11 rate-plan variants carry a non-zero price in this UAT tenant.', rows:[
-      { nm:'ExoPhone — Landline', sub:'Recurring · Monthly', price:'₹0.00', unit:'/number/mo', zero:true,
+      { nm:'ExoPhone — Landline', desc:'Monthly rental for a landline-type virtual number.', sub:'Recurring · Monthly', price:'₹0.00', unit:'/number/mo', zero:true,
         plan:'Number Rental – Monthly', charge:'Platform::Recurring::Number Rental - Landline', tiers:[['Flat','₹0.00']] },
-      { nm:'ExoPhone — Mobile', sub:'Recurring · Monthly', price:'₹0.00', unit:'/number/mo', zero:true,
+      { nm:'ExoPhone — Mobile', desc:'Monthly rental for a mobile-type virtual number.', sub:'Recurring · Monthly', price:'₹0.00', unit:'/number/mo', zero:true,
         plan:'Number Rental – Monthly', charge:'Platform::Recurring::Number Rental - Mobile', tiers:[['Flat','₹0.00']] },
-      { nm:'ExoPhone — Toll-free', sub:'Recurring · Monthly', price:'₹0.00', unit:'/number/mo', zero:true,
+      { nm:'ExoPhone — Toll-free', desc:'Monthly rental for a toll-free virtual number.', sub:'Recurring · Monthly', price:'₹0.00', unit:'/number/mo', zero:true,
         plan:'Number Rental – Monthly', charge:'Platform::Recurring::Number Rental - Tollfree', tiers:[['Flat','₹0.00']] }
     ]}
   ];
@@ -421,9 +424,11 @@
         <div class="signal-accordion" id="${id}">
           <button class="accordion-summary" aria-expanded="false">
             <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>
+            <span class="row-icon" style="color:var(--tonal-${chipColor}-text); background:var(--tonal-${chipColor}-bg);">${ICONS[cat.icon]}</span>
             <span class="summary-text">
               <span class="t-body1" style="font-weight:600; display:block;">${r.nm}</span>
               <span class="t-caption">${r.sub}</span>
+              ${r.desc ? `<span class="t-caption row-desc">${r.desc}</span>` : ''}
             </span>
             <span class="summary-price">
               <span class="amt mono">${r.price}</span>
