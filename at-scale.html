@@ -99,10 +99,14 @@
   .filter-row{ display:flex; gap:6px; overflow-x:auto; padding:2px 2px 4px; }
   .filter-row::-webkit-scrollbar{ height:5px; }
   .filter-row::-webkit-scrollbar-thumb{ background:var(--divider); border-radius:99px; }
-  .filter-chip{ appearance:none; cursor:pointer; flex-shrink:0; font-family:var(--font); font-weight:600; font-size:11.5px;
+  .filter-chip{ appearance:none; cursor:pointer; flex-shrink:0; display:inline-flex; align-items:center; gap:6px;
+    font-family:var(--font); font-weight:600; font-size:11.5px;
     color:var(--text-secondary); background:var(--surface-1); border:1px solid var(--divider); border-radius:999px;
-    padding:6px 11px; white-space:nowrap; transition:background .15s ease, color .15s ease, border-color .15s ease; }
-  .filter-chip .n{ opacity:.7; margin-left:4px; }
+    padding:5px 11px 5px 7px; white-space:nowrap; transition:background .15s ease, color .15s ease, border-color .15s ease; }
+  .filter-chip .dot{ width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .filter-chip .dot svg{ width:13px; height:13px; }
+  .filter-chip[aria-pressed="true"] .dot{ background:rgba(255,255,255,0.25) !important; color:inherit !important; }
+  .filter-chip .n{ opacity:.7; margin-left:2px; }
   .filter-chip:hover{ border-color:var(--primary-main); }
   .filter-chip[aria-pressed="true"]{ background:var(--primary-main); color:var(--primary-contrastText); border-color:var(--primary-main); }
   .filter-chip[data-flag="true"]{ background:var(--tonal-warning-bg); color:var(--tonal-warning-text); border-color:transparent; }
@@ -218,15 +222,36 @@
     'CRM & Helpdesk Integrations':'info','Call-flow Apps':'default'
   };
 
+  const CAT_ICON = {
+    'Account & Platform': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/><path d="M7 14h4"/></svg>',
+    'Calling': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5c0 8 7 15 15 15l1-4-5-2-1.5 1.5A12 12 0 0 1 8 10.5L9.5 9 7.5 4z"/></svg>',
+    'Call Recording & Streaming': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 10v4M9 7v10M13 5v14M17 8v8M21 11v2"/></svg>',
+    'Messaging (SMS)': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+    'WhatsApp': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17l-3 3 .8-3.6A8 8 0 1 1 7 17z"/><path d="M9 10c0 3 2 5 5 5"/></svg>',
+    'RCS': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="12" rx="2"/><path d="M8 20h8M9 12h6M9 9h3"/></svg>',
+    'Voice AI': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>',
+    'Users & Numbers': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 8a3 3 0 1 1 3 3"/><path d="M21 20c0-2.6-1.7-4.8-4-5.6"/></svg>',
+    'Lead Assist': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>',
+    'Truecaller': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg>',
+    'CRM & Helpdesk Integrations': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><rect x="4" y="7" width="16" height="13" rx="2"/><path d="M4 13h16"/></svg>',
+    'Call-flow Apps': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>'
+  };
+
   const cats = {};
   DATA.forEach(r => { cats[r.cat] = (cats[r.cat]||0) + 1; });
   const catList = Object.keys(cats).sort((a,b) => cats[b]-cats[a]);
   const zeroCount = DATA.filter(r => r.zero).length;
 
+  const allIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M3 9h18M9 3v18"/></svg>';
+  const zeroIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>';
+
   const filterRow = document.getElementById('filter-row');
-  filterRow.innerHTML = `<button class="filter-chip" data-cat="__all__" aria-pressed="true">All <span class="n">${DATA.length}</span></button>` +
-    catList.map(c => `<button class="filter-chip" data-cat="${c}" aria-pressed="false">${c} <span class="n">${cats[c]}</span></button>`).join('') +
-    `<button class="filter-chip" data-flag="true" data-cat="__zero__" aria-pressed="false">Not priced <span class="n">${zeroCount}</span></button>`;
+  filterRow.innerHTML = `<button class="filter-chip" data-cat="__all__" aria-pressed="true"><span class="dot" style="background:var(--tonal-primary-bg); color:var(--tonal-primary-text);">${allIcon}</span>All <span class="n">${DATA.length}</span></button>` +
+    catList.map(c => {
+      const cc = CAT_COLOR[c] || 'default';
+      return `<button class="filter-chip" data-cat="${c}" aria-pressed="false"><span class="dot" style="background:var(--tonal-${cc}-bg); color:var(--tonal-${cc}-text);">${CAT_ICON[c] || ''}</span>${c} <span class="n">${cats[c]}</span></button>`;
+    }).join('') +
+    `<button class="filter-chip" data-flag="true" data-cat="__zero__" aria-pressed="false"><span class="dot" style="background:var(--tonal-warning-bg); color:var(--tonal-warning-text);">${zeroIcon}</span>Not priced <span class="n">${zeroCount}</span></button>`;
 
   let activeCat = '__all__';
   let activeZeroOnly = false;
